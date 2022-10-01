@@ -45,7 +45,7 @@ if viewVideo==True:
     print("-------------------------------")
     print("")
 else:
-    seconds=5
+    seconds=1000000
 counter=0
 counter=float(counter)
 
