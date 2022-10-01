@@ -78,7 +78,7 @@ wp1 = LocationGlobalRelative(-33.2779604, -70.6298053,13)
 vehicle =connectMyCopter()
 arm_and_takeoff(10)
 
-goto(wp1)
+#goto(wp1)
 #time.sleep(5)
 #vehicle.mode ='RTL'
 
