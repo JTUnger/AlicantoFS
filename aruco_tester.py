@@ -28,7 +28,7 @@ aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
 parameters = aruco.DetectorParameters_create()
 
 #Get calcoefs form YAML file
-with open('calcoefs.yaml') as f:
+with open('calcoefs.yaml',"r") as f:
     loadeddict = yaml.load(f)
     mtx = loadeddict.get('camera_matrix')
     dist = loadeddict.get('dist_coeff')
