@@ -15,7 +15,7 @@ def connectMyCopter():
     vehicle = connect(connection_string, baud=baud_rate, wait_ready=True)
     return vehicle
 
-def arm():
+def arm(vehicle):
     vehicle.mode = VehicleMode("GUIDED")
     while vehicle.mode != "GUIDED":
         print("Waiting for drone to enter GUIDED flight mode")
@@ -32,7 +32,7 @@ def arm():
     print("Vehicle is armed!")
     return None
 
-def takeoff(aTargetAltitude):
+def takeoff(aTargetAltitude,vehicle):
 
     print("Taking off!")
     vehicle.simple_takeoff(aTargetAltitude)
