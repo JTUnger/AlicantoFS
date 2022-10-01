@@ -46,7 +46,7 @@ notfound_count=0
 first_run=0 #Used to set initial time of function to determine FPS
 start_time=0
 end_time=0
-script_mode = 1 ##1 for arm and takeoff, 2 for manual LOITER to GUIDED land 
+script_mode = 2 ##1 for arm and takeoff, 2 for manual LOITER to GUIDED land 
 ready_to_land=0 ##1 to trigger landing
 
 manualArm=True ##If True, arming from RC controller, If False, arming from this script. 
