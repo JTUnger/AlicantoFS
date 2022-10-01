@@ -14,7 +14,7 @@ import yaml
 width=800
 height=600
 cap = WebcamVideoStream(src=0, height=height, width=width).start()
-viewVideo=True
+viewVideo=False
 if len(sys.argv)>1:
     viewVideo=sys.argv[1]
     if viewVideo=='0' or viewVideo=='False' or viewVideo=='false':
@@ -28,10 +28,12 @@ aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
 parameters = aruco.DetectorParameters_create()
 
 #Get calcoefs form YAML file
-with open('calcoefs.yaml',"r") as f:
-    loadeddict = yaml.load(f)
-    mtx = loadeddict.get('camera_matrix')
-    dist = loadeddict.get('dist_coeff')
+mtx = np.array([[933.9466925521707, 0, 358.59608943398365],
+                [0, 935.0635463990791, 293.0721064675127],
+                [0, 0, 1]])
+            
+dist = np.array([-0.4530790972005633, 0.3951099938612813, 0.0037673873203789916, 0.0016363264710513889, -0.38177331299300393])
+
 
 #############################
 
