@@ -183,7 +183,7 @@ def lander():
             print("MARKER POSITION: x=" +x+" y= "+y+" z="+z)
             found_count=found_count+1
             print("")
-        else:
+		else:
             notfound_count=notfound_count+1
     except Exception as e:
         print('Target likely not found. Error: '+str(e))
@@ -211,13 +211,13 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 if script_mode ==1:
     arm_and_takeoff(takeoff_height)
     print(str(time.time()))
-    #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
+#send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
-    ready_to_land=1
+ready_to_land=1
 elif script_mode==2:
     while vehicle.mode!='GUIDED':
         time.sleep(1)
-        print("Waiting for manual change from mode "+str(vehicle.mode)+" to GUIDED")
+    print("Waiting for manual change from mode "+str(vehicle.mode)+" to GUIDED")
     ready_to_land=1
 
 if ready_to_land==1:
