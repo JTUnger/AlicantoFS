@@ -45,7 +45,5 @@ def takeoff(aTargetAltitude):
         time.sleep(1)
     return None
 
-vehicle = connectMyCopter()
-arm()
-takeoff(3)
+
 
