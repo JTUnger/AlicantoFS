@@ -1,9 +1,9 @@
 ###########DEPENDENCIES################
 import time
 import socket
-import exceptions
 import math
 import argparse
+from arm_takeoff_3 import arm, takeoff, connectMyCopter
 
 from dronekit import connect, VehicleMode,LocationGlobalRelative,APIException
 from pymavlink import mavutil
@@ -51,57 +51,6 @@ ready_to_land=0 ##1 to trigger landing
 
 manualArm=True ##If True, arming from RC controller, If False, arming from this script. 
 #########FUNCTIONS#################
-
-def connectMyCopter():
-
-	parser = argparse.ArgumentParser(description='commands')
-	parser.add_argument('--connect')
-	args = parser.parse_args()
-
-	connection_string = args.connect
-
-	if not connection_string:
-            connection_string='127.0.0.1:14550'
-
-	vehicle = connect(connection_string,wait_ready=True)
-
-	return vehicle
-
-def arm_and_takeoff(targetHeight):
-	while vehicle.is_armable!=True:
-		print("Waiting for vehicle to become armable.")
-		time.sleep(1)
-	print("Vehicle is now armable")
-    
-	vehicle.mode = VehicleMode("GUIDED")
-            
-	while vehicle.mode!='GUIDED':
-		print("Waiting for drone to enter GUIDED flight mode")
-		time.sleep(1)
-	print("Vehicle now in GUIDED MODE. Have fun!!")
-
-        if manualArm==False:
-            vehicle.armed = True
-            while vehicle.armed==False:
-                print("Waiting for vehicle to become armed.")
-                time.sleep(1)
-        else:
-            if vehicle.armed == False:
-                print("Exiting script. manualArm set to True but vehicle not armed.")
-                print("Set manualArm to True if desiring script to arm the drone.")
-                return None
-        print("Look out! Props are spinning!!")
-            
-	vehicle.simple_takeoff(targetHeight) ##meters
-
-	while True:
-		print(("Current Altitude: %d"%vehicle.location.global_relative_frame.alt))
-		if vehicle.location.global_relative_frame.alt>=.95*targetHeight:
-			break
-		time.sleep(1)
-	print("Target altitude reached!!")
-
-	return None
 
 def send_local_ned_velocity(vx, vy, vz):
 	msg = vehicle.message_factory.set_position_target_local_ned_encode(
@@ -209,7 +158,8 @@ vehicle.parameters['PLND_EST_TYPE'] = 0 ##0 for raw sensor, 1 for kalman filter 
 vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
-    arm_and_takeoff(takeoff_height)
+    arm()
+    takeoff(8)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
