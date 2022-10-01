@@ -79,13 +79,13 @@ vehicle =connectMyCopter()
 arm_and_takeoff(10)
 
 goto(wp1)
-time.sleep(5)
-vehicle.mode ='RTL'
+#time.sleep(5)
+#vehicle.mode ='RTL'
 
-while vehicle.mode != 'RTL':
-	print('waiting for RTL mode')
-	time.sleep(1)
-print('RTL mode activated')
+#while vehicle.mode != 'RTL':
+#	print('waiting for RTL mode')
+#	time.sleep(1)
+#print('RTL mode activated')
 
 while True:
 	time.sleep(1)
