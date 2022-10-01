@@ -8,6 +8,7 @@ import time
 import os
 import platform
 import sys
+import yaml
 #############################
 
 width=800
@@ -26,9 +27,12 @@ realWorldEfficiency=.7 ##Iterations/second are slower when the drone is flying. 
 aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
 parameters = aruco.DetectorParameters_create()
 
-calib_path="/home/pi/video2calibration/calibrationFiles/"
-cameraMatrix   = np.loadtxt(calib_path+'cameraMatrix.txt', delimiter=',')
-cameraDistortion   = np.loadtxt(calib_path+'cameraDistortion.txt', delimiter=',')
+#Get calcoefs form YAML file
+with open('calibration.yaml') as f:
+    loadeddict = yaml.load(f)
+    mtx = loadeddict.get('camera_matrix')
+    dist = loadeddict.get('dist_coeff')
+
 #############################
 
 seconds=0
@@ -57,7 +61,7 @@ while time.time()-start_time<seconds:
         print("Found these IDs in the frame:")
         print(ids)
     if ids is not None and ids[0] == id_to_find:
-        ret = aruco.estimatePoseSingleMarkers(corners,marker_size,cameraMatrix=cameraMatrix,distCoeffs=cameraDistortion)
+        ret = aruco.estimatePoseSingleMarkers(corners,marker_size,cameraMatrix=mtx,distCoeffs=dist)
         rvec,tvec = ret[0][0,0,:], ret[1][0,0,:]
         x="{:.2f}".format(tvec[0])
         y="{:.2f}".format(tvec[1])
@@ -68,7 +72,7 @@ while time.time()-start_time<seconds:
         print("")
         if viewVideo==True:
             aruco.drawDetectedMarkers(frame_np,corners)
-            aruco.drawAxis(frame_np,cameraMatrix,cameraDistortion,rvec,tvec,10)
+            aruco.drawAxis(frame_np,mtx,dist,rvec,tvec,10)
             cv2.imshow('frame',frame_np)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
