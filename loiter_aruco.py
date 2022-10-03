@@ -137,7 +137,7 @@ def lander(debug = False):
                 print("------------------------")
                 print("Vehicle now in LAND mode")
                 print("------------------------")
-                send_land_message(y_ang,x_ang)
+                send_land_message(-1*y_ang,x_ang)
             else:
                 send_land_message(-1*y_ang,x_ang,debug_setting = debug)
                 pass

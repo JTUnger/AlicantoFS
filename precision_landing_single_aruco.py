@@ -86,12 +86,14 @@ def lander():
         start_time=time.time()
         
     frame = cap.read()
+    frame = cv2.flip(frame,0) #flips camera to correct orientation
+    frame = cv2.flip(frame,1)
     frame = cv2.resize(frame,(horizontal_res,vertical_res))
     frame_np = np.array(frame)
     gray_img = cv2.cvtColor(frame_np,cv2.COLOR_BGR2GRAY)
     ids=''
     corners, ids, rejected = aruco.detectMarkers(image=gray_img,dictionary=aruco_dict,parameters=parameters)
-    if vehicle.mode!='LAND':
+    if vehicle.mode!='LAND' and vehicle.mode != "POSHOLD":
         vehicle.mode=VehicleMode("LAND")
         while vehicle.mode!='LAND':
             print('WAITING FOR DRONE TO ENTER LAND MODE')
@@ -123,9 +125,9 @@ def lander():
                 print("------------------------")
                 print("Vehicle now in LAND mode")
                 print("------------------------")
-                send_land_message(x_ang,y_ang)
+                send_land_message(-1*y_ang,x_ang)
             else:
-                send_land_message(x_ang,y_ang)
+                send_land_message(-1*y_ang,x_ang)
                 pass
             print(("X CENTER PIXEL: "+str(x_avg)+" Y CENTER PIXEL: "+str(y_avg)))
             print(("FOUND COUNT: "+str(found_count)+" NOTFOUND COUNT: "+str(notfound_count)))
@@ -159,7 +161,7 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
     arm(vehicle)
-    takeoff(8,vehicle)
+    takeoff(7,vehicle)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
