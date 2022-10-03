@@ -35,10 +35,10 @@ cap = WebcamVideoStream(src=0, width=horizontal_res, height=vertical_res).start(
 horizontal_fov =59  * (math.pi / 180 ) ##Pi cam V1: 53.5 V2: 62.2
 vertical_fov =46  * (math.pi / 180)    ##Pi cam V1: 41.41 V2: 48.8
 
-cameraMatrix   = np.array([[933.9466925521707, 0, 358.59608943398365],
+cameraMatrix_rpi   = np.array([[933.9466925521707, 0, 358.59608943398365],
                 [0, 935.0635463990791, 293.0721064675127],
                 [0, 0, 1]])
-cameraDistortion   = np.array([-0.4530790972005633, 0.3951099938612813, 0.0037673873203789916, 0.0016363264710513889, -0.38177331299300393])
+cameraDistortion_rpi   = np.array([-0.4530790972005633, 0.3951099938612813, 0.0037673873203789916, 0.0016363264710513889, -0.38177331299300393])
 ##
 
 ##Counters and script triggers
@@ -82,7 +82,8 @@ def send_land_message(x,y, debug_setting = False):
         vehicle.flush()
         
     else:
-        print("Vehiculo corrigiendo X: ", x, " Y: ", y)
+        pass
+        #print("Vehiculo corrigiendo X: ", x, " Y: ", y)
 
 def lander(debug = False):
     global first_run,notfound_count,found_count,marker_size,start_time
@@ -106,7 +107,7 @@ def lander(debug = False):
 
     try:
         if ids is not None and ids[0] == id_to_find:
-            ret = aruco.estimatePoseSingleMarkers(corners,marker_size,cameraMatrix=cameraMatrix,distCoeffs=cameraDistortion)
+            ret = aruco.estimatePoseSingleMarkers(corners,marker_size,cameraMatrix=cameraMatrix_rpi,distCoeffs=cameraDistortion_rpi)
             (rvec, tvec) = (ret[0][0, 0, :], ret[1][0, 0, :])
             x = '{:.2f}'.format(tvec[0])
             y = '{:.2f}'.format(tvec[1])
@@ -120,6 +121,9 @@ def lander(debug = False):
     
             x_avg = x_sum*.25
             y_avg = y_sum*.25
+
+            if debug == True:
+                print(f"X Aruco: {x_avg} Y Aruco: {y_avg}")
             
             x_ang = (x_avg - horizontal_res*.5)*(horizontal_fov/horizontal_res)
             y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res)
