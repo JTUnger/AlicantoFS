@@ -13,8 +13,8 @@ import yaml
 
 width=800
 height=600
-cap = WebcamVideoStream(src=-1, height=height, width=width).start()
-viewVideo=False
+cap = WebcamVideoStream(src=0, height=height, width=width).start()
+viewVideo=True
 if len(sys.argv)>1:
     viewVideo=sys.argv[1]
     if viewVideo=='0' or viewVideo=='False' or viewVideo=='false':
