@@ -122,13 +122,13 @@ def lander(debug = False):
             y_sum = corners[0][0][0][1]+ corners[0][0][1][1]+ corners[0][0][2][1]+ corners[0][0][3][1]
     
             x_avg = x_sum*.25
-            y_avg = y_sum*.25
+            y_avg = y_sum*.25 #relative to OpenCV cordinates
 
             #if debug == True:
             #    print(f"X Aruco: {x_avg} Y Aruco: {y_avg}")
             
             x_ang = (x_avg - horizontal_res*.5)*(horizontal_fov/horizontal_res)
-            y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res)
+            y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res) #relative to OpenCV cordinates
             
             if vehicle.mode!='LAND' and debug == False:
                 vehicle.mode = VehicleMode('LAND')
@@ -137,9 +137,9 @@ def lander(debug = False):
                 print("------------------------")
                 print("Vehicle now in LAND mode")
                 print("------------------------")
-                send_land_message(x_ang,y_ang)
+                send_land_message(y_ang,x_ang)
             else:
-                send_land_message(x_ang,y_ang,debug_setting = debug)
+                send_land_message(y_ang,x_ang,debug_setting = debug)
                 pass
             #print(("X CENTER PIXEL: "+str(x_avg)+" Y CENTER PIXEL: "+str(y_avg)))
             #print(("FOUND COUNT: "+str(found_count)+" NOTFOUND COUNT: "+str(notfound_count)))
