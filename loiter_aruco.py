@@ -139,7 +139,7 @@ def lander(debug = False):
                 print("------------------------")
                 send_land_message(y_ang,x_ang)
             else:
-                send_land_message(-1*y_ang,-1*x_ang,debug_setting = debug)
+                send_land_message(-1*y_ang,x_ang,debug_setting = debug)
                 pass
             #print(("X CENTER PIXEL: "+str(x_avg)+" Y CENTER PIXEL: "+str(y_avg)))
             #print(("FOUND COUNT: "+str(found_count)+" NOTFOUND COUNT: "+str(notfound_count)))
