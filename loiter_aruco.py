@@ -83,7 +83,7 @@ def send_land_message(x,y, debug_setting = False):
         
     else:
         pass
-        #print("Vehiculo corrigiendo X: ", x, " Y: ", y)
+        print("Vehiculo corrigiendo X: ", x, " Y: ", y)
 
 def lander(debug = False):
     global first_run,notfound_count,found_count,marker_size,start_time
@@ -124,8 +124,8 @@ def lander(debug = False):
             x_avg = x_sum*.25
             y_avg = y_sum*.25
 
-            if debug == True:
-                print(f"X Aruco: {x_avg} Y Aruco: {y_avg}")
+            #if debug == True:
+            #    print(f"X Aruco: {x_avg} Y Aruco: {y_avg}")
             
             x_ang = (x_avg - horizontal_res*.5)*(horizontal_fov/horizontal_res)
             y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res)
