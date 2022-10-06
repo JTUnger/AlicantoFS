@@ -125,9 +125,9 @@ def lander():
                 print("------------------------")
                 print("Vehicle now in LAND mode")
                 print("------------------------")
-                send_land_message(-1*y_ang,x_ang)
+                send_land_message(x_ang,y_ang)
             else:
-                send_land_message(-1*y_ang,x_ang)
+                send_land_message(x_ang,y_ang)
                 pass
             print(("X CENTER PIXEL: "+str(x_avg)+" Y CENTER PIXEL: "+str(y_avg)))
             print(("FOUND COUNT: "+str(found_count)+" NOTFOUND COUNT: "+str(notfound_count)))
@@ -161,7 +161,7 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
     arm(vehicle)
-    takeoff(7,vehicle)
+    takeoff(6,vehicle)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)

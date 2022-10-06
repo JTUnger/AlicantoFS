@@ -128,7 +128,7 @@ def lander(debug = False):
             #    print(f"X Aruco: {x_avg} Y Aruco: {y_avg}")
             
             x_ang = (x_avg - horizontal_res*.5)*(horizontal_fov/horizontal_res)
-            y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res) #relative to OpenCV cordinates
+            y_ang = (y_avg - vertical_res*.5)*(vertical_fov/vertical_res) 
             
             if vehicle.mode!='LAND' and debug == False:
                 vehicle.mode = VehicleMode('LAND')
