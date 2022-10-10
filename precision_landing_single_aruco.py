@@ -143,7 +143,7 @@ def lander():
         print(('Target likely not found. Error: '+str(e)))
         notfound_count=notfound_count+1
 
-def program_exit(vehicle):
+def program_exit():
     if vehicle.armed:
         if vehicle.mode != "LAND" or vehicle.mode != "RTL" or vehicle.mode != "GUIDED":
             #se sube a 15m deja el drone en POSHOLD y cierra el script
@@ -170,7 +170,7 @@ def program_exit(vehicle):
 ######################################################
 
 vehicle = connectMyCopter()
-exitTread = threading.Thread(target=program_exit, args=vehicle)
+exitTread = threading.Thread(target=program_exit)
 exitTread.start()
 
 ##
