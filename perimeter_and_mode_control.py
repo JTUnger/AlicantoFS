@@ -97,7 +97,7 @@ def per_check(points):
 			ev.set()
 			break
 
-def mode_check():      ev2 = Event()            
+def mode_check():                 
     while True:
 		if vehicle.mode != 'GUIDED':
 			print('Interrupcion')
