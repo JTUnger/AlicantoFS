@@ -151,6 +151,7 @@ def program_exit(vehicle):
             while vehicle.mode != "GUIDED":
                 time.sleep(1)
                 print("Waiting for drone to enter GUIDED mode")
+            print("EMERGENCY STOP")
             gotoLocation = LocationGlobalRelative(vehicle.location.lat, vehicle.location.lon, 15)
             goto(gotoLocation)
             vehicle.mode = VehicleMode("POSHOLD")
@@ -182,7 +183,7 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
     arm(vehicle)
-    takeoff(8,vehicle)
+    takeoff(7,vehicle)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
