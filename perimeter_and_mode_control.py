@@ -94,20 +94,21 @@ def per_check(points):
         time.sleep(1)
         check = point_in_hull((vehicle.location.global_relative_frame.lat, vehicle.location.global_relative_frame.lon), hull)
         if check == False:
-			ev.set()
-			break
+            ev.set()
+            break
+
 
 def mode_check():                 
     while True:
-		if vehicle.mode != 'GUIDED':
-			print('Interrupcion')
-			ev2.set()
-			current_lat = vehicle.location.global_relative_frame.lat
-			current_lon = vehicle.location.global_relative_frame.lon
-			vehicle.mode = 'GUIDED'
-			new_wp = LocationGlobalRelative(current_lat, current_lon, 25)
-			vehicle.simple_goto(new_wp)
-			break
+        if vehicle.mode != 'GUIDED':
+            print('Interrupcion')
+            ev2.set()
+            current_lat = vehicle.location.global_relative_frame.lat
+            current_lon = vehicle.location.global_relative_frame.lon
+            vehicle.mode = 'GUIDED'
+            new_wp = LocationGlobalRelative(current_lat, current_lon, 25)
+            vehicle.simple_goto(new_wp)
+            break
 
 def cambio_modo():
 	time.sleep(10)
@@ -124,13 +125,14 @@ def cambio_modo():
 
 ## python connection_template.py --connect 127.0.0.1:14550
 
-pp1 = (44.501596,-88.062479)
-pp2 = (44.501602,-88.061943)
-pp3= (44.500983,-88.062237)
+pp1 = (-33.110904,-70.778185)
+pp2 = (-33.111119,-70.777732)
+pp3= (-33.111249,-70.777917)
+pp4= (-33.111073,-70.778349)
 
 
 
-wp1 = LocationGlobalRelative(44.502366, -88.062223, 10)
+wp1 = LocationGlobalRelative(-33.111429, -70.778409, 10)
 vehicle =connectMyCopter()
 arm_and_takeoff(10)
 ptos = np.asarray([pp1,pp2,pp3])
@@ -138,11 +140,11 @@ ev = Event()
 ev2 = Event()
 new_thread1 = Thread(target = per_check, args = (ptos,))
 time.sleep(1)
-new_thread2 = Thread(target = mode_check)
-new_thread3 = Thread(target = cambio_modo)
+#new_thread2 = Thread(target = mode_check)
+#new_thread3 = Thread(target = cambio_modo)
 new_thread1.start()
-new_thread2.start()
-new_thread3.start()
+#new_thread2.start()
+#new_thread3.start()
 goto(wp1)
 
 #vehicle.mode ='LAND'
