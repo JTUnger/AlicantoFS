@@ -182,7 +182,7 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
     arm(vehicle)
-    takeoff(10,vehicle)
+    takeoff(8,vehicle)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
