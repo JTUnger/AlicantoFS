@@ -4,6 +4,9 @@ import socket
 import math
 import argparse
 from arm_takeoff_3 import arm, takeoff, connectMyCopter
+from location_based_movement import goto
+import sys
+import threading
 
 from dronekit import connect, VehicleMode,LocationGlobalRelative,APIException
 from pymavlink import mavutil
@@ -139,6 +142,22 @@ def lander():
     except Exception as e:
         print(('Target likely not found. Error: '+str(e)))
         notfound_count=notfound_count+1
+
+def program_exit(vehicle):
+    if vehicle.armed:
+        if vehicle.mode != "LAND" or vehicle.mode != "RTL" or vehicle.mode != "GUIDED":
+            #se sube a 15m deja el drone en POSHOLD y cierra el script
+            vehicle.mode = VehicleMode("GUIDED")
+            while vehicle.mode != "GUIDED":
+                time.sleep(1)
+                print("Waiting for drone to enter GUIDED mode")
+            gotoLocation = LocationGlobalRelative(vehicle.location.lat, vehicle.location.lon, 15)
+            goto(gotoLocation)
+            vehicle.mode = VehicleMode("POSHOLD")
+            sys.exit()
+        
+            
+
     
      
  
@@ -150,6 +169,8 @@ def lander():
 ######################################################
 
 vehicle = connectMyCopter()
+exitTread = threading.Thread(target=program_exit, args=vehicle)
+exitTread.start()
 
 ##
 ##SETUP PARAMETERS TO ENABLE PRECISION LANDING
@@ -161,7 +182,7 @@ vehicle.parameters['LAND_SPEED'] = 20 ##Descent speed of 30cm/s
 
 if script_mode ==1:
     arm(vehicle)
-    takeoff(6,vehicle)
+    takeoff(10,vehicle)
     print((str(time.time())))
     #send_local_ned_velocity(velocity,velocity,0) ##Offset drone from target
     time.sleep(1)
