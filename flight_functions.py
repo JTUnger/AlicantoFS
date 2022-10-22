@@ -174,6 +174,11 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19, max_land
 
 
         print("Landing attempt: ", landing_attempts + 1)
+        #este falla pq el drone se encuentra en modo LAND!!!!!!!
+        vehicle.mode = VehicleMode("GUIDED")
+        while vehicle.mode.name != 'GUIDED':
+            print("debug")
+            time.sleep(1)
         set_altitude(vehicle, start_height)
         found_count = 0
         notfound_count = 0
