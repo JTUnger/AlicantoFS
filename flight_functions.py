@@ -281,8 +281,9 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19, max_land
                     notfound_count += 1
                     abort_counter += 1
 
-    #If all landing attempts are completed, and vehicle in still armed, raise LandingError exception
+    #If all landing attempts are completed, and vehicle in still armed, raise LandingError exception and go to safe altitude
     if vehicle.armed == True:
+        set_altitude(vehicle, safety_height)
         raise LandingError("Precision Landing Failed")
 
 def loiter_aruco(vehicle, loiterAltitude):
