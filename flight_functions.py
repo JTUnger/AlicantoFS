@@ -150,7 +150,7 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19, max_land
     vertical_fov = 46 * (math.pi/180)
 
     #Start Video Capture
-    capture = WebcamVideoStream(scr = 0, width = horizontal_res, height = vertical_res).start()
+    capture = WebcamVideoStream(width = horizontal_res, height = vertical_res).start()
 
     #Camera Intrinsics
     cameraMatrix   = np.array([[933.9466925521707, 0, 358.59608943398365],
