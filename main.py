@@ -3,6 +3,5 @@ from exceptions import *
 import time 
 
 vehicle = connectMyCopter()
-arm_takeoff(vehicle, 5)
-time.sleep(3)
-set_altitude(vehicle, 8)
+arm_takeoff(vehicle, 4)
+aruco_precision_landing(vehicle, 8, safety_height= 12)

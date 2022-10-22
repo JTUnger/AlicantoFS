@@ -213,6 +213,7 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19, max_land
         
         #Precision Landing begins if aruco is found in one frame
         if land == True:
+            print('Aruco found, precision landing started')
             while vehicle.armed == True:
                 abort_counter = 0
                 #Capture frame and flip to correct orientation and prep
