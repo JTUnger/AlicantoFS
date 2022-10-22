@@ -281,9 +281,14 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19, max_land
                     notfound_count += 1
                     abort_counter += 1
 
-    #If all landing attempts are completed, and vehicle in still armed, raise LandingError exception and go to safe altitude
+    #If all landing attempts are completed, and vehicle in still armed, 
+    # raise LandingError exception and go to safe altitude and set mode to guided
     if vehicle.armed == True:
         set_altitude(vehicle, safety_height)
+        vehicle.mode = VehicleMode("GUIDED")
+        while vehicle.mode != "GUIDED":
+            time.sleep(0.5)
+        print("All landing attempts completed, vehicle still armed, aborting")
         raise LandingError("Precision Landing Failed")
 
 def loiter_aruco(vehicle, loiterAltitude):
