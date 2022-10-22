@@ -78,12 +78,17 @@ def goto(vehicle, targetloc, safety_distance = 500):
     
 def set_altitude(vehicle, targetAltitude):
     """"Sets vehicle height, does not move vehicle."""
-    vehicle.location.global_relative_frame.alt = targetAltitude
+    #gets current location
+    currentloc = vehicle.location.global_relative_frame
+    vehicle.simple_goto(LocationGlobalRelative(currentloc.lat, currentloc.lon, targetAltitude))   
+    #checks if altitude is reached
     while True:
-        if vehicle.global_relative_frame.alt >= targetAltitude*0.95:
-            print("Altitude reached")
+        print("Altitude: ", vehicle.location.global_relative_frame.alt)
+        if vehicle.location.global_relative_frame.alt >= targetAltitude*0.95:
+            print("Target altitude reached")
             break
-        time.sleep(1)   
+        time.sleep(1)
+    
 
 def send_local_ned_velocity(vehicle, vx, vy, vz):
     """ Sends velocity commands to drone, takes vehicle object, vx, vy, vz as parameters. 
