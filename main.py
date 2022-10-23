@@ -4,4 +4,4 @@ import time
 
 vehicle = connectMyCopter()
 arm_takeoff(vehicle, 4)
-loiter_aruco(vehicle, 7, 20)
+aruco_precision_landing(vehicle)

@@ -380,6 +380,8 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
         while vehicle.mode != "LOITER":
             time.sleep(0.5)
 
+        
+
         timeout = time.time() + loiter_time
         while time.time() < timeout:
             #Capture frame and flip to correct orientation and prep
