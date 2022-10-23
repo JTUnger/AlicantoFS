@@ -1,4 +1,5 @@
 
+from os import abort
 from re import search
 from dronekit import *
 import time
@@ -339,6 +340,7 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
     found_count = 0
     notfound_count = 0
     search_frames = 0
+    abort_counter = 0
     loiter = False
 
     ##Vehicle is hovering at start_height and looks for aruco marker for 15 frames, 
