@@ -5,3 +5,7 @@ class SecurityError(Exception):
 class LandingError(Exception):
     """Raised when precision landing fails."""
     pass
+
+class LoiterError(Exception):
+    """Raised when precision loiter fails."""
+    pass
