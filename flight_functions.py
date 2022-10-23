@@ -327,6 +327,7 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
     vehicle.parameters['PLND_ENABLED'] = 1  #Enable Precision Landing
     vehicle.parameters['PLND_TYPE'] = 1     #1 for companion computer
     vehicle.parameters['PLND_EST_TYPE'] = 0 #0 for raw sensor, 1 for kalman filter pos estimation
+    vehicle.parameters['PLND_STRICT'] = 2  #2 for strict landing, 1 for loose landing
 
     #Precision Loiter Logic
 
