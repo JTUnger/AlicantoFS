@@ -77,6 +77,11 @@ def goto(vehicle, targetloc, safety_distance = 500):
             time.sleep(2)
             break
         time.sleep(1)
+
+def goto_local_frame(vehicle, north, east, down):
+    """Moves drone to target location in local NED frame. Takes vehicle object, north, east, down as parameters.
+    North, east, down are in meters. """
+    pass
     
 def set_altitude(vehicle, targetAltitude):
     """"Sets vehicle height, does not move vehicle."""
@@ -118,6 +123,52 @@ def send_global_ned_velocity(vehicle, vx, vy, vz):
 		0,0)
     vehicle.send_mavlink(msg)
     vehicle.flush()	
+
+def send_local_ned_position(vehicle, north, east, down):
+    """ Sends position commands to drone, takes vehicle object, north, east, down as parameters.
+    Position commands are in NED frame relative to drone. Position commands in meters.
+    This msg can be interupted by other commands"""
+    msg = vehicle.message_factory.set_position_target_local_ned_encode(
+        0,0,0,
+        mavutil.mavlink.MAV_FRAME_BODY_OFFSET_NED,
+        0b0000111111111000,
+        north,east,down,
+        0,0,0,
+        0,0,0,
+        0,0)
+    vehicle.send_mavlink(msg)
+    vehicle.flush()
+
+def condition_yaw(vehicle, heading, relative=False):
+    """
+    Send MAV_CMD_CONDITION_YAW message to point vehicle at a specified heading (in degrees).
+
+    This method sets an absolute heading by default, but you can set the `relative` parameter
+    to `True` to set yaw relative to the current yaw heading.
+
+    By default the yaw of the vehicle will follow the direction of travel. After setting 
+    the yaw using this function there is no way to return to the default yaw "follow direction 
+    of travel" behaviour (https://github.com/diydrones/ardupilot/issues/2427)
+
+    For more information see: 
+    http://copter.ardupilot.com/wiki/common-mavlink-mission-command-messages-mav_cmd/#mav_cmd_condition_yaw
+    """
+    if relative:
+        is_relative = 1 #yaw relative to direction of travel
+    else:
+        is_relative = 0 #yaw is an absolute angle
+    # create the CONDITION_YAW command using command_long_encode()
+    msg = vehicle.message_factory.command_long_encode(
+        0, 0,    # target system, target component
+        mavutil.mavlink.MAV_CMD_CONDITION_YAW, #command
+        0, #confirmation
+        heading,    # param 1, yaw in degrees
+        0,          # param 2, yaw speed deg/s
+        1,          # param 3, direction -1 ccw, 1 cw
+        is_relative, # param 4, relative offset 1, absolute angle 0
+        0, 0, 0)    # param 5 ~ 7 not used
+    # send command to vehicle
+    vehicle.send_mavlink(msg)
 
 def send_land_message(vehicle, x, y):
     """ Sends encoded landing target position to drone, if vehicle is in LAND mode 
@@ -301,7 +352,7 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19,
 def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aruco = 72, size_aruco_cm = 20):
     """Vehicle comes down to loiter_height and looks for aruco marker with the correct id_aruco, if marker is found,
     vehicle moves to marker and loiters at loiter_height. Vehicle loiters for loiter_time seconds and then sets its mode to guided.
-    If aruco marker is not found, vehicle goes to safety_height, sets mode to guided and raises LoiterError exception."""
+    If aruco marker is not found, vehicle goes to safety_height, sets mode to guided and raises LoiterError exception. (NOT WORKING YET!)"""
 
     #Aruco Dictionary
     aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
@@ -380,7 +431,7 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
         while vehicle.mode != "LOITER":
             time.sleep(0.5)
 
-        
+
 
         timeout = time.time() + loiter_time
         while time.time() < timeout:
