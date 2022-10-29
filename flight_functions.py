@@ -89,8 +89,8 @@ def goto_local_frame(vehicle, north, east, down):
     #checks if xy planar movement is reached and altitude is reached
     while vehicle.mode.name=='GUIDED':
         currentloc = vehicle.location.global_relative_frame
-        currentdist=  get_distance_meters(initialloc, currentloc)
-        if currentdist > xyplanar_movement*0.99:
+        moved_distance=  get_distance_meters(initialloc, currentloc)
+        if moved_distance > xyplanar_movement*0.99:
             print('xy planar movement reached')
             time.sleep(1)
             break
@@ -99,13 +99,8 @@ def goto_local_frame(vehicle, north, east, down):
             time.sleep(1)
             break
         time.sleep(1)
-    print('movement finished')
+    print('Movement finished')
     
-def play_tune(vehicle, tune):
-    '''Play a tune on the vehicle using the buzzer'''
-    msg = vehicle.message_factory.play_tune_encode(0, 0, tune)
-    vehicle.send_mavlink(msg)
-
 def set_altitude(vehicle, targetAltitude):
     """"Sets vehicle height, does not move vehicle."""
     #gets current location
