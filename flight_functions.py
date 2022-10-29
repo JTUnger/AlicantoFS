@@ -81,7 +81,25 @@ def goto(vehicle, targetloc, safety_distance = 500):
 def goto_local_frame(vehicle, north, east, down):
     """Moves drone to target location in local NED frame. Takes vehicle object, north, east, down as parameters.
     North, east, down are in meters. """
-    pass
+    #save initial location
+    initialloc = vehicle.location.global_relative_frame
+    #move vehicle to target location
+    send_local_ned_position(vehicle, north, east, down)
+    xyplanar_movement = math.sqrt(north**2 + east**2)
+    #checks if xy planar movement is reached and altitude is reached
+    while vehicle.mode.name=='GUIDED':
+        currentloc = vehicle.location.global_relative_frame
+        currentdist=  get_distance_meters(initialloc, currentloc)
+        if currentdist > xyplanar_movement*0.99:
+            print('xy planar movement reached')
+            time.sleep(1)
+            break
+        if currentloc.alt <= initialloc.alt + down*0.99:
+            print('altitude reached')
+            time.sleep(1)
+            break
+        time.sleep(1)
+    print('movement finished')
     
 def set_altitude(vehicle, targetAltitude):
     """"Sets vehicle height, does not move vehicle."""
@@ -169,6 +187,8 @@ def condition_yaw(vehicle, heading, relative=False):
         0, 0, 0)    # param 5 ~ 7 not used
     # send command to vehicle
     vehicle.send_mavlink(msg)
+
+
 
 def send_land_message(vehicle, x, y):
     """ Sends encoded landing target position to drone, if vehicle is in LAND mode 
