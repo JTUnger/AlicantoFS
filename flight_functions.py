@@ -101,6 +101,11 @@ def goto_local_frame(vehicle, north, east, down):
         time.sleep(1)
     print('movement finished')
     
+def play_tune(vehicle, tune):
+    '''Play a tune on the vehicle using the buzzer'''
+    msg = vehicle.message_factory.play_tune_encode(0, 0, tune)
+    vehicle.send_mavlink(msg)
+
 def set_altitude(vehicle, targetAltitude):
     """"Sets vehicle height, does not move vehicle."""
     #gets current location
