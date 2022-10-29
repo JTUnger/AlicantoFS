@@ -188,8 +188,6 @@ def condition_yaw(vehicle, heading, relative=False):
     # send command to vehicle
     vehicle.send_mavlink(msg)
 
-
-
 def send_land_message(vehicle, x, y):
     """ Sends encoded landing target position to drone, if vehicle is in LAND mode 
     and recives landing target position, precision landing will be enabled."""
@@ -519,5 +517,32 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
         set_altitude(vehicle, safety_height)
         print("Aruco probably not found, precision loiter failed")
         raise LoiterError("Precision Loiter Failed")
+
+def SAR_search_pattern(vehicle,
+                        x_area, y_area,
+                        x_landpad, y_landpad,
+                        search_height):
+    """"This function runs the SAR pattern based on the estimated size of the SAR task field and the estimated start landing/takeoff pad.
+    This function returns the Lat/Long of the start point and 2 photos with their asociated Lat/Longs."""
+
+#                                                                                            #(x_area,y_area)
+#                ##############################################################################
+#                #                                                                            #
+#                #                                                                            #  #El drone tiene que ser orientado de tal manera
+#                #                                                                            #  #que el eje x apunte hacia el este del drone y el                                                                       
+#                #                                                                            #  #eje y apunte hacia el norte del drone
+#                #                                                                            #
+#                #                                                                            #
+#     #y_area    #           Photo1(x1,y_area/2)                Photo2(x2,y_area/2)           #
+#                #                                                                            #
+#                #--x_landpad--                                                               #
+#                #         [   ^   ]                                                          #
+#              ^ #         [   |   ] |                                                        #
+#              | #         [   |   ] |  y_landpad                                             #
+#              | #                   |                                                        #
+#              | #                   |                                                        #  
+#              + ##############################################################################
+#              #(0,0)+------>                       #x_area
+pass
         
     
