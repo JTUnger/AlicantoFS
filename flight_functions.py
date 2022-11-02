@@ -1,6 +1,3 @@
-
-from os import abort
-from re import search
 from dronekit import *
 import time
 import socket
@@ -13,6 +10,8 @@ import cv2.aruco as aruco
 import numpy as np
 from imutils.video import WebcamVideoStream
 import imutils
+import datetime
+import os
 
 def connectMyCopter():
     """ Connects to drone and returns vehicle object, takes argument "connect" 
@@ -521,28 +520,103 @@ def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aru
 def SAR_search_pattern(vehicle,
                         x_area, y_area,
                         x_landpad, y_landpad,
-                        search_height):
+                        search_height,
+                        horizontal_res, vertical_res,
+                        doRTL = False, 
+                        debug = False):
     """"This function runs the SAR pattern based on the estimated size of the SAR task field and the estimated start landing/takeoff pad.
-    This function returns the Lat/Long of the start point and 2 photos with their asociated Lat/Longs."""
+    This function returns the Lat/Long of the start point and 2 photos with their asociated Lat/Longs. Photos are saved as OpenCV captures, 
+    and also are saved into .../AlicantoFS/SARPhotos/SAR-YEAR-MONTH-DAY-HOUR-MINUTE-SECOND-PhotoNumber.jpg"""
 
 #                                                                                            #(x_area,y_area)
 #                ##############################################################################
 #                #                                                                            #
-#                #                                                                            #  #El drone tiene que ser orientado de tal manera
-#                #                                                                            #  #que el eje x apunte hacia el este del drone y el                                                                       
-#                #                                                                            #  #eje y apunte hacia el norte del drone
-#                #                                                                            #
+#                # ------x_side------                                     -------x_side------ #  #El drone tiene que ser orientado de tal manera
+#                #                                                                            #  #que el eje x positivo apunte hacia el este del drone y el                                                                       
+#                #                                                                            #  #eje y positivo apunte hacia el norte del drone
+#                #                    ----------x_between_photos----------                    #
 #                #                                                                            #
 #     #y_area    #           Photo1(x1,y_area/2)                Photo2(x2,y_area/2)           #
 #                #                                                                            #
 #                #--x_landpad--                                                               #
-#                #         [   ^   ]                                                          #
+#                #         [   ^x  ]                                                          #
 #              ^ #         [   |   ] |                                                        #
-#              | #         [   |   ] |  y_landpad                                             #
+#              | #         [   |_ y] |  y_landpad                                             #
 #              | #                   |                                                        #
 #              | #                   |                                                        #  
 #              + ##############################################################################
 #              #(0,0)+------>                       #x_area
-pass
-        
+
+    #Move vehicle to search height
+    set_altitude(vehicle, search_height)
+
+    #Set yaw control to  relative and hold start yaw 
+    condition_yaw(vehicle, 0, relative=True)
+    
+    #calculate relative movement neeeded to go to Photo1
+    relative_x_photo1 = 0
+    relative_y_photo1 = 0
+
+    if y_landpad > y_area/2: # if the landing pad is in the top half of the search area
+        relative_y_photo1 = -1 * (y_landpad - y_area/2)
+    elif y_landpad < y_area/2: # if the landing pad is in the bottom half of the search area
+        relative_y_photo1 = y_area/2 - y_landpad
+    else:
+        relative_y_photo1 = 0
+    
+    x_between_photos = 0.35 * x_area
+    x_side = (x_area - x_between_photos)/2
+    
+    if x_landpad > x_side: # if the landing pad is right of Photo1
+        relative_x_photo1 = -1 * (x_landpad - x_side)
+    elif x_landpad < x_side: # if the landing pad is left of Photo1
+        relative_x_photo1 = x_side - x_landpad
+
+    if(debug == True):
+        print("Modo Debug, coordenadas son entregadas de manera reliativa al drone ((+)Adelante/(-)Atras, (+)Derecha/(-)Izquierda)")
+        print("Movimiento calculado para ir a Photo1 desde LandPad: ",relative_y_photo1, relative_x_photo1)
+        print("Movimiento calculado para ir a Photo2 desde Photo1: ",0, x_between_photos)
+
+    #Start OpenCV capture and set resolution 
+    cap = cv2.VideoCapture(0)
+    cap.set(3, horizontal_res)
+    cap.set(4, vertical_res)
+
+    #Set path to save photos
+    save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "SARPhotos")
+
+    #Move to Photo1
+    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1)
+    time.sleep(3)
+
+    #Take Photo1, save as OpenCV capture and save as .jpg, save lat/long of photo and home point
+    photo1 = cap.read()[1]
+    photo1_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
+                 + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo1.jpg"
+    cv2.imwrite(os.path.join(save_path, photo1_name), photo1)
+    photo1_lat = vehicle.location.global_relative_frame.lat
+    photo1_long = vehicle.location.global_relative_frame.lon
+    home_lat = vehicle.home_location.lat
+    home_long = vehicle.home_location.lon
+
+    #Move to Photo2
+    goto_local_frame(vehicle, 0, x_between_photos)
+    time.sleep(3)
+
+    #Take Photo2
+    photo2 = cap.read()[1]
+    photo2_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
+                    + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo2.jpg"
+    cv2.imwrite(os.path.join(save_path, photo2_name), photo2)
+    photo2_lat = vehicle.location.global_relative_frame.lat
+    photo2_long = vehicle.location.global_relative_frame.lon
+    pass
+
+    if(doRTL == True):
+        vehicle.mode = VehicleMode("RTL")
+        while vehicle.mode != "RTL":
+            time.sleep(0.5)
+        print("Vehicle is now in RTL mode")
+    
+    return photo1, photo2, photo1_lat, photo1_long, photo2_lat, photo2_long, home_lat, home_long
     
