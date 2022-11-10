@@ -63,10 +63,8 @@ void setup()
 
 void loop()
 {
-  SerialUSB.println("Sending message");
-
   //Send a message to the other radio
-  uint8_t toSend[] = "Hi there!";
+  uint8_t toSend[] = SerialUSB.readStringUntil('\n').c_str();
   //sprintf(toSend, "Hi, my counter is: %d", packetCounter++);
   rf95.send(toSend, sizeof(toSend));
   rf95.waitPacketSent();
@@ -78,17 +76,10 @@ void loop()
   if (rf95.waitAvailableTimeout(2000)) {
     // Should be a reply message for us now
     if (rf95.recv(buf, &len)) {
-      SerialUSB.print("Got reply: ");
       SerialUSB.println((char*)buf);
       //SerialUSB.print(" RSSI: ");
       //SerialUSB.print(rf95.lastRssi(), DEC);
     }
-    else {
-      SerialUSB.println("Receive failed");
-    }
-  }
-  else {
-    SerialUSB.println("No reply, is the receiver running?");
   }
   delay(500);
 }
