@@ -37,7 +37,8 @@ void setup()
 
   Serial.begin(9600);
 
-  while(!SerialUSB);
+  while(!Serial);
+  Serial.println("SERIAL OK");
   //Se espera a que haya una conexion serial.
 
   
@@ -75,8 +76,8 @@ void loop(){
 
 
   //if (Serial.available())
-  String input_serial = SerialUSB.readString();
-  SerialUSB.flush();
+  String input_serial = Serial.readString();
+  Serial.flush();
 
   const uint8_t* output_lora = reinterpret_cast<const uint8_t*>(input_serial.c_str());
   rf95.send(output_lora, 100);
@@ -84,7 +85,7 @@ void loop(){
 
   //SerialUSB.println(input_serial);
   //SerialUSB.println(*output_lora);
-  SerialUSB.flush(); ///////////////////////////
+  Serial.flush(); ///////////////////////////
 
 
   if (rf95.recv(buf, &len)) {
@@ -94,17 +95,9 @@ void loop(){
     input_lora.trim();
 
 
-    SerialUSB.println(input_lora);
-    SerialUSB.flush();
+    Serial.println(input_lora);
+    Serial.flush();
   
   }
 delay(100);
 }
-
-
-
-
-
-
-
-
