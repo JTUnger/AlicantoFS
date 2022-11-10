@@ -1,19 +1,19 @@
 from flight_functions import *
 from cv_functions import *
-from funciones_lora import *
+#from funciones_lora import *
 import exceptions
 import time 
 
 #Task parameters and field dimensions
-takeoff_height = 5
-x_area = 10
-y_area = 10
+takeoff_height = 4
+x_area = 5
+y_area = 5
 x_landpad = 1
 y_landpad = 1
-search_height = 7
+search_height = 6
 horizontal_res = 1920
 vertical_res = 1080
-doRTL = True
+doRTL = False
 debug = True
 
 #Connect to vehicle and return Vehicle object
