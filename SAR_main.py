@@ -20,7 +20,7 @@ debug = True
 vehicle = connectMyCopter()
 
 #Arm vehicle and takeoff to specified height
-###arm_takeoff(vehicle, takeoff_height)
+arm_takeoff(vehicle, takeoff_height)
 
 #Run SAR search pattern and grab images and GPS coordinates (Se que se ve horrible, pero es lo que hay)
 (photo1, photo2,
