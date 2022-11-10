@@ -610,8 +610,14 @@ def SAR_search_pattern(vehicle,
     cv2.imwrite(os.path.join(save_path, photo1_name), photo1)
     photo1_lat = vehicle.location.global_relative_frame.lat
     photo1_long = vehicle.location.global_relative_frame.lon
-    home_lat = vehicle.home_location.lat
-    home_long = vehicle.home_location.lon
+
+    #If vehicle has home location save coordinates, else return None for lat/long
+    if vehicle.home_location is not None:
+        home_lat = vehicle.home_location.lat
+        home_long = vehicle.home_location.lon
+    else:
+        home_lat = None
+        home_long = None
 
     #Reorient yaw to initial orientation
     #condition_yaw(vehicle, initial_yaw, relative=False)
