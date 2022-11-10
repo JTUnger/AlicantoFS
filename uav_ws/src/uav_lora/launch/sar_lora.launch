@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<launch>
+    <node name="sar_lora" pkg="sar_lora" type="sar_lora_pub.py" output='screen'></node>
+</launch>

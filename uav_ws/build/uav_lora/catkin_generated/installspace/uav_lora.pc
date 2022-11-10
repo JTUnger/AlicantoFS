@@ -1,0 +1,8 @@
+prefix=/home/lsel/AlicantoFS/uav_ws/install
+
+Name: uav_lora
+Description: Description of uav_lora
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
