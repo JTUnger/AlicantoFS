@@ -19,7 +19,6 @@ class PolarSub():
         self.lon = float()
         self.lora_ser = Serial(self.PORT, self.BAUD)
         self.pol_sub = rospy.Subscriber("/nav/polar", Float32MultiArray, self.polar_callback)
-        self.dat_pub = rospy.Publisher("/uav/data", list, queue_size=60)
         self.stt_pub = rospy.Publisher("/uav/status", int, queue_size=60)
         self.status = {1: "Stowed", 2: "Deployed", 3: "Faulted"}
         self.loop_thread = Thread(target=self.loop)
@@ -35,16 +34,11 @@ class PolarSub():
         out = self.build_data()
         self.lora_ser.write(out)
     
-    def parse_data(self, data: str) -> dict:
-        out = {'data': None, 'status': None}
+    def parse_data(self, data: str) -> int:
+        out = 3
         data = data.split(",")
         if data[0] in self.status.keys():  # string o int??
             out['status'] = data[0]
-        else:  # data tiene que venir formateada desde lora
-            out['data'] = data
-            return out
-        _, *data = data
-        out['data'] = ",".join(data)
         return out
 
     def loop(self) -> None:
@@ -52,10 +46,7 @@ class PolarSub():
         while not rospy.is_shutdown():
             info = self.lora_ser.read()
             parsed_data = self.parse_data(info)
-            if parsed_data['data']:
-                self.lora_pub.publish(parsed_data['data'])
-            if parsed_data['status']:
-                self.lora_pub.publish(parsed_data['status'])
+            self.stt_pub.publish(parsed_data)
 
 if __name__ == "__main__":
     print("Starting SAR LoRa sub!")
