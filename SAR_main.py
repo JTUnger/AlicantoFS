@@ -5,16 +5,16 @@ import exceptions
 import time 
 
 #Task parameters and field dimensions
-takeoff_height = 8
+takeoff_height = 5
 x_area = 10
 y_area = 10
 x_landpad = 1
 y_landpad = 1
-search_height = 12
+search_height = 7
 horizontal_res = 1920
 vertical_res = 1080
 doRTL = True
-debug = False
+debug = True
 
 #Connect to vehicle and return Vehicle object
 vehicle = connectMyCopter()
@@ -32,3 +32,4 @@ home_lat, home_long) = SAR_search_pattern(vehicle, x_area, y_area, x_landpad, y_
 
 #Use OpenCV to process images and return the coordinates of the target
 pass
+print("END")

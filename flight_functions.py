@@ -550,8 +550,12 @@ def SAR_search_pattern(vehicle,
     #Move vehicle to search height
     set_altitude(vehicle, search_height)
 
-    #Set yaw control to  relative and hold start yaw 
-    condition_yaw(vehicle, 0, relative=True)
+    #Save initial yaw orientation relative to global
+    initial_yaw = vehicle.heading
+
+    #Set yaw to hold and orient to current heading
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(1)
     
     #calculate relative movement neeeded to go to Photo1
     relative_x_photo1 = 0
@@ -589,6 +593,10 @@ def SAR_search_pattern(vehicle,
     goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1)
     time.sleep(3)
 
+    #Orient yaw to global north
+    condition_yaw(vehicle, 0, relative=False)
+    time.sleep(3)
+
     #Take Photo1, save as OpenCV capture and save as .jpg, save lat/long of photo and home point
     photo1 = cap.read()[1]
     photo1_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
@@ -599,8 +607,16 @@ def SAR_search_pattern(vehicle,
     home_lat = vehicle.home_location.lat
     home_long = vehicle.home_location.lon
 
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
+
     #Move to Photo2
     goto_local_frame(vehicle, 0, x_between_photos)
+    time.sleep(3)
+
+    #Orient yaw to global north
+    condition_yaw(vehicle, 0, relative=False)
     time.sleep(3)
 
     #Take Photo2
@@ -610,7 +626,10 @@ def SAR_search_pattern(vehicle,
     cv2.imwrite(os.path.join(save_path, photo2_name), photo2)
     photo2_lat = vehicle.location.global_relative_frame.lat
     photo2_long = vehicle.location.global_relative_frame.lon
-    pass
+    
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
 
     if(doRTL == True):
         vehicle.mode = VehicleMode("RTL")
