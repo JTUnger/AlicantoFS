@@ -605,6 +605,10 @@ def SAR_search_pattern(vehicle,
     if not success1:
         print("Error reading photo1")
 
+    #Flip image to correct orientation
+    photo1 = cv2.flip(photo1, 0)
+    photo1 = cv2.flip(photo1, 1)
+
     photo1_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                  + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo1.jpg"
     cv2.imwrite(os.path.join(save_path, photo1_name), photo1)
@@ -635,6 +639,10 @@ def SAR_search_pattern(vehicle,
     success2, photo2 = cap.read()
     if not success2:
         print("Error reading photo2")
+
+    #Flip image to correct orientation
+    photo2 = cv2.flip(photo2, 0)
+    photo2 = cv2.flip(photo2, 1)
 
     photo2_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                     + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo2.jpg"
