@@ -7,7 +7,7 @@ import os
 import math
 import rospy
 import tf
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, Int16
 from serial import Serial
 from threading import Thread
 
@@ -19,7 +19,7 @@ class PolarSub():
         self.lon = float()
         self.lora_ser = Serial(self.PORT, self.BAUD)
         self.pol_sub = rospy.Subscriber("/nav/polar", Float32MultiArray, self.polar_callback)
-        self.stt_pub = rospy.Publisher("/uav/status", int, queue_size=60)
+        self.stt_pub = rospy.Publisher("/uav/status", Int16, queue_size=60)
         self.status = {1: "Stowed", 2: "Deployed", 3: "Faulted"}
         self.loop_thread = Thread(target=self.loop)
         self.loop_thread.start()
@@ -37,7 +37,8 @@ class PolarSub():
     def parse_data(self, data: str) -> int:
         out = 3
         data = data.split(",")
-        if data[0] in self.status.keys():  # string o int??
+        if data[0] in self.status.keys():
+            # string o int?? Cual es el indice del status??
             out['status'] = data[0]
         return out
 

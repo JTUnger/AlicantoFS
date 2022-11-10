@@ -21,7 +21,8 @@ class UavRos():
     def parse_data(self, data: str) -> dict:
         data = data.split(",")
         out = {'data': None, 'status': None}
-        if data[0] in self.status.keys():  # string o int??
+        if data[0] in self.status.keys():
+            # string o int?? Cual es el indice del status??
             out['status'] = data[0]
         else:
             out['data'] = ','.join(data)
