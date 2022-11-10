@@ -583,6 +583,9 @@ def SAR_search_pattern(vehicle,
 
     #Start OpenCV capture and set resolution 
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error opening video stream from camera")
+
     cap.set(3, horizontal_res)
     cap.set(4, vertical_res)
 
@@ -598,7 +601,10 @@ def SAR_search_pattern(vehicle,
     #time.sleep(3)
 
     #Take Photo1, save as OpenCV capture and save as .jpg, save lat/long of photo and home point
-    photo1 = cap.read()
+    success1, photo1 = cap.read()
+    if not success1:
+        print("Error reading photo1")
+
     photo1_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                  + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo1.jpg"
     cv2.imwrite(os.path.join(save_path, photo1_name), photo1)
@@ -620,7 +626,10 @@ def SAR_search_pattern(vehicle,
     #time.sleep(3)
 
     #Take Photo2
-    photo2 = cap.read()
+    success2, photo2 = cap.read()
+    if not success2:
+        print("Error reading photo2")
+
     photo2_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                     + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo2.jpg"
     cv2.imwrite(os.path.join(save_path, photo2_name), photo2)
