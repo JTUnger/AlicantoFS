@@ -590,12 +590,12 @@ def SAR_search_pattern(vehicle,
     save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "SARPhotos")
 
     #Move to Photo1
-    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1)
+    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1, 0)
     time.sleep(3)
 
     #Orient yaw to global north
-    condition_yaw(vehicle, 0, relative=False)
-    time.sleep(3)
+    #condition_yaw(vehicle, 0, relative=False)
+    #time.sleep(3)
 
     #Take Photo1, save as OpenCV capture and save as .jpg, save lat/long of photo and home point
     photo1 = cap.read()[1]
@@ -608,16 +608,16 @@ def SAR_search_pattern(vehicle,
     home_long = vehicle.home_location.lon
 
     #Reorient yaw to initial orientation
-    condition_yaw(vehicle, initial_yaw, relative=False)
-    time.sleep(3)
+    #condition_yaw(vehicle, initial_yaw, relative=False)
+    #time.sleep(3)
 
     #Move to Photo2
-    goto_local_frame(vehicle, 0, x_between_photos)
+    goto_local_frame(vehicle, 0, x_between_photos, 0)
     time.sleep(3)
 
     #Orient yaw to global north
-    condition_yaw(vehicle, 0, relative=False)
-    time.sleep(3)
+    #condition_yaw(vehicle, 0, relative=False)
+    #time.sleep(3)
 
     #Take Photo2
     photo2 = cap.read()[1]
@@ -628,8 +628,8 @@ def SAR_search_pattern(vehicle,
     photo2_long = vehicle.location.global_relative_frame.lon
     
     #Reorient yaw to initial orientation
-    condition_yaw(vehicle, initial_yaw, relative=False)
-    time.sleep(3)
+    #condition_yaw(vehicle, initial_yaw, relative=False)
+    #time.sleep(3)
 
     if(doRTL == True):
         vehicle.mode = VehicleMode("RTL")
