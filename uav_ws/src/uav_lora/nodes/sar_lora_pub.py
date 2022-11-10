@@ -18,19 +18,26 @@ class UavRos():
         self.stt_pub = rospy.Publisher("/uav/status", int, queue_size=60)
         self.status = {1: "Manual", 2: "Autonomous", 3: "Faulted"}
     
-    def build_data(self, data: str) -> list:
-        out = data.split(",")
+    def parse_data(self, data: str) -> dict:
+        data = data.split(",")
+        out = {'data': None, 'status': None}
+        if data[0] in self.status.keys():  # string o int??
+            out['status'] = data[0]
+        else:
+            out['data'] = ','.join(data)
+            return out
+        _, *data = data
+        out['data'] = ','.join(data)
         return out
-    
-    def build_status(self, status: int) -> list:
-        pass
     
     def loop(self) -> None:
         while not rospy.is_shutdown():
             info = self.lora_ser.read()
-            out = self.build_data(info)
-            self.dat_pub.publish(out)
-
+            parsed_data = self.parse_data(info)
+            if parsed_data['data']:
+                self.dat_pub.publish(parsed_data['data'])
+            if parsed_data['status']:
+                self.stt_pub.publish(parsed_data['status'])
     
     def sar_init(self) -> None:
         self.lora_ser = Serial(self.PORT, self.BAUD)
