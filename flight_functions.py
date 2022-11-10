@@ -551,11 +551,11 @@ def SAR_search_pattern(vehicle,
     set_altitude(vehicle, search_height)
 
     #Save initial yaw orientation relative to global
-    initial_yaw = vehicle.heading
+    #initial_yaw = vehicle.heading
 
     #Set yaw to hold and orient to current heading
-    condition_yaw(vehicle, initial_yaw, relative=False)
-    time.sleep(1)
+    condition_yaw(vehicle, 0, relative=True)
+    time.sleep(5)
     
     #calculate relative movement neeeded to go to Photo1
     relative_x_photo1 = 0
@@ -591,7 +591,7 @@ def SAR_search_pattern(vehicle,
 
     #Move to Photo1
     goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1, 0)
-    time.sleep(3)
+    time.sleep(5)
 
     #Orient yaw to global north
     #condition_yaw(vehicle, 0, relative=False)
@@ -613,7 +613,7 @@ def SAR_search_pattern(vehicle,
 
     #Move to Photo2
     goto_local_frame(vehicle, 0, x_between_photos, 0)
-    time.sleep(3)
+    time.sleep(5)
 
     #Orient yaw to global north
     #condition_yaw(vehicle, 0, relative=False)
