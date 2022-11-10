@@ -10,15 +10,13 @@ import tf
 from std_msgs.msg import Float32MultiArray
 from serial import Serial
 
-print("Starting SAR LoRa pub!")
-
 class UavRos():
-    def __init__(self, port: str, baud: int)
+    def __init__(self, port: str, baud: int) -> None:
         self.PORT = port
         self.BAUD = baud
         self.dat_pub = rospy.Publisher("/uav/data", list, queue_size=60)
         self.stt_pub = rospy.Publisher("/uav/status", int, queue_size=60)
-        self.valid_status = {1: "Manual", 2: "Autonomous", 3: "Faulted"}
+        self.status = {1: "Manual", 2: "Autonomous", 3: "Faulted"}
     
     def build_data(self, data: str) -> list:
         out = data.split(",")
@@ -39,8 +37,9 @@ class UavRos():
         self.loop()
 
 if __name__ == "__main__":
+    print("Starting SAR LoRa pub!")
     PORT = '/dev/ttyUSB0'
     BAUD = 9600
-    print(f"Attempting to setup LoRa trnsceiver at {PORT}:{BAUD}")
+    print(f"Attempting to setup LoRa transceiver at {PORT}:{BAUD}")
     sar_node = SarRos(port=PORT, baud=BAUD)
     sar_node.sar_init()
