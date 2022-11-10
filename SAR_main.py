@@ -6,8 +6,8 @@ import time
 
 #Task parameters and field dimensions
 takeoff_height = 4
-x_area = 5
-y_area = 5
+x_area = 6
+y_area = 6
 x_landpad = 1
 y_landpad = 1
 search_height = 6
