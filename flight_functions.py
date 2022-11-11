@@ -560,10 +560,6 @@ def SAR_search_pattern(vehicle,
     else:
         home_lat = None
         home_long = None
-
-    #Set yaw to hold and orient to current heading
-    condition_yaw(vehicle, 0, relative=True)
-    time.sleep(3)
     
     #calculate relative movement neeeded to go to Photo1 from home
     relative_x_photo1 = 0
