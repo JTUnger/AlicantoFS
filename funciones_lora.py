@@ -24,6 +24,8 @@ def reportar_status_SAR(vehicle):
 	"""Lee el status del drone y lo transforma en un mensaje que indica el status del drone. Se usa para el task de SAR.
 	Las opciones son: Manual, Autonomous, Faulted. Toma de entrada un objeto Vehicle y de salida retorna un string que indica
 	el status, se usa dentro de un loop esta funcion."""
+	if vehicle.system_status == "EMERGENCY" or vehicle.system_status == "CRITICAL":
+		return "Faulted"
 
 	if vehicle.mode.name == "GUIDED" or vehicle.mode.name == "RTL" or vehicle.mode.name == "LAND":
 		return "Autonomous"
@@ -31,14 +33,25 @@ def reportar_status_SAR(vehicle):
 	elif vehicle.mode.name == "STABILIZE" or vehicle.mode.name == "POSHOLD":
 		return "Manual"
 
-	
-	pass
+	else:
+		return "Faulted"
 
 def reportar_status_HEARTBEAT(vehicle):
 	"""Lee el status del drone y lo transforma en un mensaje que indica el status del drone. Se usa para el heartbeat.
 	Las opciones son: Stowed, Deployed, Faulted. Toma de entrada un objeto Vehicle y de salida retorna un string que indica
 	el status, se usa dentro de un loop esta funcion."""
-	pass
+	if vehicle.system_status == "EMERGENCY" or vehicle.system_status == "CRITICAL":
+		return "Faulted"
+	
+	elif vehicle.armed == True:
+		return "Deployed"
+
+	elif vehicle.armed == False:
+		return "Stowed"
+	
+	else:
+		return "Faulted"
+	
 
 
 ################### Ejecutable ############################
