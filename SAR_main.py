@@ -50,6 +50,7 @@ class SarControl():
                     out += f"{data[val]},"
                 else:
                     out += ","
+            return out
         def transmit_heart(data: str) -> None:
             self.ser_samd21.write(data)
         while not self.done:
