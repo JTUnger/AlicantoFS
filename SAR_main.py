@@ -6,14 +6,14 @@ import time
 
 #Task parameters and field dimensions
 takeoff_height = 4
-x_area = 6
-y_area = 6
+x_area = 20
+y_area = 10
 x_landpad = 1
 y_landpad = 1
-search_height = 6
+search_height = 10
 horizontal_res = 1920
 vertical_res = 1080
-doRTL = False
+doRTL = True
 debug = True
 
 #Connect to vehicle and return Vehicle object
