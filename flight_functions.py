@@ -550,8 +550,12 @@ def SAR_search_pattern(vehicle,
     #Move vehicle to search height
     set_altitude(vehicle, search_height)
 
-    #Set yaw control to  relative and hold start yaw 
-    condition_yaw(vehicle, 0, relative=True)
+    #Save initial yaw orientation relative to global
+    initial_yaw = vehicle.heading
+
+    #Set yaw to hold and orient to current heading
+    condition_yaw(vehicle, 1, relative=True)
+    time.sleep(3)
     
     #calculate relative movement neeeded to go to Photo1
     relative_x_photo1 = 0
@@ -579,6 +583,9 @@ def SAR_search_pattern(vehicle,
 
     #Start OpenCV capture and set resolution 
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error opening video stream from camera")
+
     cap.set(3, horizontal_res)
     cap.set(4, vertical_res)
 
@@ -586,31 +593,66 @@ def SAR_search_pattern(vehicle,
     save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "SARPhotos")
 
     #Move to Photo1
-    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1)
+    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1, 0)
+    time.sleep(5)
+
+    #Orient yaw to global north
+    condition_yaw(vehicle, 0, relative=False)
     time.sleep(3)
 
     #Take Photo1, save as OpenCV capture and save as .jpg, save lat/long of photo and home point
-    photo1 = cap.read()[1]
+    success1, photo1 = cap.read()
+    if not success1:
+        print("Error reading photo1")
+
+    #Flip image to correct orientation
+    photo1 = cv2.flip(photo1, 0)
+    photo1 = cv2.flip(photo1, 1)
+
     photo1_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                  + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo1.jpg"
     cv2.imwrite(os.path.join(save_path, photo1_name), photo1)
     photo1_lat = vehicle.location.global_relative_frame.lat
     photo1_long = vehicle.location.global_relative_frame.lon
-    home_lat = vehicle.home_location.lat
-    home_long = vehicle.home_location.lon
+
+    #If vehicle has home location save coordinates, else return None for lat/long
+    if vehicle.home_location is not None:
+        home_lat = vehicle.home_location.lat
+        home_long = vehicle.home_location.lon
+    else:
+        home_lat = None
+        home_long = None
+
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
 
     #Move to Photo2
-    goto_local_frame(vehicle, 0, x_between_photos)
+    goto_local_frame(vehicle, 0, x_between_photos, 0)
+    time.sleep(5)
+
+    #Orient yaw to global north
+    condition_yaw(vehicle, 0, relative=False)
     time.sleep(3)
 
     #Take Photo2
-    photo2 = cap.read()[1]
+    success2, photo2 = cap.read()
+    if not success2:
+        print("Error reading photo2")
+
+    #Flip image to correct orientation
+    photo2 = cv2.flip(photo2, 0)
+    photo2 = cv2.flip(photo2, 1)
+
     photo2_name = "SAR-" + str(datetime.datetime.now().year) + "-" + str(datetime.datetime.now().month) + "-" + str(datetime.datetime.now().day) \
                     + "-" + str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute) + "-" + str(datetime.datetime.now().second) + "-Photo2.jpg"
     cv2.imwrite(os.path.join(save_path, photo2_name), photo2)
     photo2_lat = vehicle.location.global_relative_frame.lat
     photo2_long = vehicle.location.global_relative_frame.lon
-    pass
+    
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
 
     if(doRTL == True):
         vehicle.mode = VehicleMode("RTL")
