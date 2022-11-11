@@ -67,7 +67,9 @@ void loop()
       SerialUSB.println();
 
       // Send a reply
-      uint8_t toSend[] = SerialUSB.readStringUntil('\n').c_str();
+      // predefine size of both messages, add padding on .py scripts
+      // as needed
+      char toSend[] = SerialUSB.readStringUntil('\n').c_str();
       rf95.send(toSend, sizeof(toSend));
       rf95.waitPacketSent();
       digitalWrite(LED, LOW); //Turn off status LED
