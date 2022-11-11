@@ -51,7 +51,7 @@ class SarControl():
                 else:
                     out += ","
         def transmit_heart(data: str) -> None:
-            self.ser_samd21.write()
+            self.ser_samd21.write(data)
         while not self.done:
             out = parse_heart(self.heart_data)
             transmit_heart(out)
