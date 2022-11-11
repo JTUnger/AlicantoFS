@@ -1,5 +1,5 @@
 // lora script for SaR task from Ground Station
-// only need to receive dron status
+// only need to receive drone status and data   
 #include <SPI.h>
 
 #include <RH_RF95.h>

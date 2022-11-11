@@ -59,7 +59,7 @@ class SarControl():
 
 
     def run_sar(self) -> None: 
-        self.ser_samd21 = Serial(port=self.PORT, baud=self.BAUD)
+        self.ser_samd21 = Serial(self.PORT, self.BAUD)
         self.vehicle = connectMyCopter()
         self.heart_thread.start()
         arm_takeoff(self.vehicle, self.takeoff_height)

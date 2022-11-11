@@ -1,5 +1,5 @@
-// lora script for SaR task on Drone
-// only needs to send status
+  // lora script for SaR task on Drone
+// only needs to send status and data 
 #include <SPI.h>
 
 #include <RH_RF95.h>
