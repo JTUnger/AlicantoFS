@@ -11,7 +11,7 @@ int LED = 13; //Status LED is on pin 13
 int packetCounter = 0; //Counts the number of packets sent
 long timeSinceLastPacket = 0; //Tracks the time stamp of last packet received
 
-float frequency = 921.2; //Broadcast frequency
+float frequency = 930.0; //Broadcast frequency
 
 void setup()
 {

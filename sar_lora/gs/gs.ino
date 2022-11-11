@@ -12,7 +12,7 @@ int LED = 13; //Status LED on pin 13
 
 int packetCounter = 0; //Counts the number of packets sent
 long timeSinceLastPacket = 0; //Tracks the time stamp of last packet received
-float frequency = 921.2;
+float frequency = 930.0;
 
 void setup()
 {
@@ -30,6 +30,7 @@ void setup()
   else{
   // An LED indicator to let us know radio initialization has completed.
     SerialUSB.println("Receiver up!");
+    SerialUSB.println("00FFFF");
     digitalWrite(LED, HIGH);
     delay(500);
     digitalWrite(LED, LOW);
