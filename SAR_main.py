@@ -8,7 +8,7 @@ from serial import Serial
 from time import sleep
 
 class SarControl():
-    def __init__(self, port="/dev/ttyUSB0", baud=9600) -> None:
+    def __init__(self, port="/dev/ttyACM0", baud=9600) -> None:
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
@@ -53,7 +53,7 @@ class SarControl():
         def transmit_heart(data: str) -> None:
             self.ser_samd21.write()
         while not self.done:
-            out = parse_heart()
+            out = parse_heart(self.heart_data)
             transmit_heart(out)
             sleep(1)
 
