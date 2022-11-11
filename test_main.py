@@ -14,6 +14,7 @@ while True:
     save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "SARPhotos")
     save_name = "photo_" + str(photo_id) + "_" + str(vehicle.location.global_relative_frame.alt) + ".jpg"
     cv2.imwrite(os.path.join(save_path, save_name), frame)
+    print("Photo saved: " + save_name)
     photo_id += 1
-    time.sleep(2)
+    time.sleep(0.7)
 
