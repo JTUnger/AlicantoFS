@@ -553,15 +553,11 @@ def SAR_search_pattern(vehicle,
     #Save initial yaw orientation relative to global
     initial_yaw = vehicle.heading
 
-    #Save initial location
-    if vehicle.home_location is not None:
-        home_lat = vehicle.home_location.lat
-        home_long = vehicle.home_location.lon
-    else:
-        home_lat = None
-        home_long = None
+    #Set yaw to hold and orient to current heading
+    condition_yaw(vehicle, 1, relative=True)
+    time.sleep(3)
     
-    #calculate relative movement neeeded to go to Photo1 from home
+    #calculate relative movement neeeded to go to Photo1
     relative_x_photo1 = 0
     relative_y_photo1 = 0
 
@@ -580,10 +576,6 @@ def SAR_search_pattern(vehicle,
     elif x_landpad < x_side: # if the landing pad is left of Photo1
         relative_x_photo1 = x_side - x_landpad
 
-    #calculate relative movement neeeded to go to Photo2 from home
-    relative_x_photo2 = relative_x_photo1 + x_between_photos
-    relative_y_photo2 = relative_y_photo1
-
     if(debug == True):
         print("Modo Debug, coordenadas son entregadas de manera reliativa al drone ((+)Adelante/(-)Atras, (+)Derecha/(-)Izquierda)")
         print("Movimiento calculado para ir a Photo1 desde LandPad: ",relative_y_photo1, relative_x_photo1)
@@ -600,30 +592,8 @@ def SAR_search_pattern(vehicle,
     #Set path to save photos
     save_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "SARPhotos")
 
-    #Transform from initial frame of reference to North aligned frame of reference
-    xt_photo1 = relative_x_photo1 * math.cos(math.radians(initial_yaw)) - relative_y_photo1 * math.sin(math.radians(initial_yaw))
-    yt_photo1 = relative_x_photo1 * math.sin(math.radians(initial_yaw)) + relative_y_photo1 * math.cos(math.radians(initial_yaw))
-
-    xt_photo2 = relative_x_photo2 * math.cos(math.radians(initial_yaw)) - relative_y_photo2 * math.sin(math.radians(initial_yaw))
-    yt_photo2 = relative_x_photo2 * math.sin(math.radians(initial_yaw)) + relative_y_photo2 * math.cos(math.radians(initial_yaw))
-
-    #Transform from North aligned frame of reference to global frame of reference
-    R = 6378137 #Earth radius in meters
-    dLat1 = yt_photo1 / R
-    dLon1 = xt_photo1 / (R * math.cos(math.pi*home_lat/180))
-    dLat2 = yt_photo2 / R
-    dLon2 = xt_photo2 / (R * math.cos(math.pi*home_lat/180))
-
-    latitude_photo1 = home_lat + dLat1 * 180/math.pi
-    longitude_photo1 = home_long + dLon1 * 180/math.pi
-    latitude_photo2 = home_lat + dLat2 * 180/math.pi
-    longitude_photo2 = home_long + dLon2 * 180/math.pi
-
-    locationPhoto1 = LocationGlobalRelative(latitude_photo1, longitude_photo1, search_height)
-    locationPhoto2 = LocationGlobalRelative(latitude_photo2, longitude_photo2, search_height)
-
     #Move to Photo1
-    goto(vehicle, locationPhoto1, safety_distance=50)
+    goto_local_frame(vehicle, relative_y_photo1, relative_x_photo1, 0)
     time.sleep(5)
 
     #Orient yaw to global north
@@ -645,9 +615,20 @@ def SAR_search_pattern(vehicle,
     photo1_lat = vehicle.location.global_relative_frame.lat
     photo1_long = vehicle.location.global_relative_frame.lon
 
+    #If vehicle has home location save coordinates, else return None for lat/long
+    if vehicle.home_location is not None:
+        home_lat = vehicle.home_location.lat
+        home_long = vehicle.home_location.lon
+    else:
+        home_lat = None
+        home_long = None
+
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
 
     #Move to Photo2
-    goto(vehicle, locationPhoto2, safety_distance=50)
+    goto_local_frame(vehicle, 0, x_between_photos, 0)
     time.sleep(5)
 
     #Orient yaw to global north
@@ -669,6 +650,10 @@ def SAR_search_pattern(vehicle,
     photo2_lat = vehicle.location.global_relative_frame.lat
     photo2_long = vehicle.location.global_relative_frame.lon
     
+    #Reorient yaw to initial orientation
+    condition_yaw(vehicle, initial_yaw, relative=False)
+    time.sleep(3)
+
     if(doRTL == True):
         vehicle.mode = VehicleMode("RTL")
         while vehicle.mode != "RTL":
