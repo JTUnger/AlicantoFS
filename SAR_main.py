@@ -52,7 +52,7 @@ class SarControl():
                     out += ","
             return out
         def transmit_heart(data: str) -> None:
-            self.ser_samd21.write(data)
+            self.ser_samd21.write(data.encode('utf8'))
         while not self.done:
             out = parse_heart(self.heart_data)
             transmit_heart(out)
