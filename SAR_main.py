@@ -117,6 +117,7 @@ class SarControl():
             # cutoff a 20 m para evitar confundir el landing pad con el objeto
             if self.vehicle.location.global_relative_frame.alt > 20.0:
                 filename = f"{counter}.png"
+                # TODO: plug undistort on {counter}.png
                 self.cam(os.path.join(self.dir, filename))
                 img_dat = {
                     "speed": self.vehicle.groundspeed,
