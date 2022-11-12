@@ -117,7 +117,7 @@ class SarControl():
                 with open(f'{counter}.json', 'w', encoding='utf8') as file:
                     json.dump(img_dat, file)
                 counter += 1
-                time.sleep(0.7)
+                time.sleep(0.5)
 
 
     def run_sar(self) -> None:
@@ -126,10 +126,10 @@ class SarControl():
         os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
         self.vehicle = connectMyCopter()
-        self.heart_thread.start()                                         self.doRTL, self.debug)
+        self.heart_thread.start()
         self.camera_thread.start()
         while self.vehicle.armed:
-            sleep(0.1)
+            sleep(1)
         self.camera_up = False
         self.camera_thread.join()
         positions = {'r': [], 'n': []}
@@ -143,7 +143,9 @@ class SarControl():
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
             query_centroid = None
-            if query_r:
+            if (query_r and query_n) or metadata["height"] < 20.0:
+                pass  # descartar, R y N o esta a menos de 20 m
+            elif query_r:
                 query_centroid = query_r
                 # TODO: transform relative point to polar
                 positions['r'].append((None, None))
@@ -176,7 +178,7 @@ class SarControl():
             self.heart_data['ewB'] = 'E'
 
         self.heart_thread.join()
-        self.done = True
+        self.heart_up = True
         self.ser_samd21.close()
         print("END OF SAR")	
 
