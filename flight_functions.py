@@ -402,6 +402,18 @@ def landingpad_precision_landing(vehicle):
         frame_np = np.array(frame)
         gray_img = cv2.cvtColor(frame_np, cv2.COLOR_BGR2GRAY)
         circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+        if circles is not None:
+            #Get the x,y coordinates of the center of mass of the circle
+            x_center = circles[0]
+            y_center = circles[1]
+            #Calculate the angle of the circle from the center of the image
+            x_angle = (x_center - horizontal_res/2) * (horizontal_fov / horizontal_res)
+            y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
+            #Send precision landing information to the autopilot
+            send_land_message(vehicle, x_angle, y_angle)
+            print("X CENTER OF CIRCLE: ", x_center + "Y CENTER OF CIRCLE: ", y_center)
+            
+
         
 
 def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aruco = 72, size_aruco_cm = 20):
