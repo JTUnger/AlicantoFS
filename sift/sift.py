@@ -67,7 +67,7 @@ if __name__ == '__main__':
     sift = SIFT()
     
     img_query = cv2.imread("letters/roboN/n0.png")  # imagen del dataset recortada
-    img_train = cv2.imread("letters/landing/landing3.png")  # imagen a consultar
+    img_train = cv2.imread("letters/roboN/n2.png")  # imagen a consultar
     #img_train = cv2.imread("letters/roboR/r1.png")
 
     sift.set_query_img(img_query)

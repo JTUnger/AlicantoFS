@@ -50,12 +50,12 @@ class SarControl():
     def query_sift(self, query_img: cv2.Mat, letter: str) -> np.ndarray:
         kp_t = None
         good = None
+        key_pts = None
         if letter == 'r':
             self.sift.set_query_img(self.sift.robo_r)
             kp_t, good = self.sift.get_sift_matches(query_img)
             if kp_t is not None and good is not None:
                 key_pts = self.sift.get_keypoints(kp_t, good)
-                return key_pts
             else:
                 return None
         elif letter == 'n':
@@ -63,11 +63,21 @@ class SarControl():
             kp_t, good = self.sift.get_sift_matches(query_img)
             if kp_t is not None and good is not None:
                 key_pts = self.sift.get_keypoints(kp_t, good)
-                return key_pts
             else:
                 return None
         else:
             raise ValueError("Letter must be 'n' or 'r'")
+        if key_pts:
+            x = 0
+            y = 0
+            for pt in key_pts:
+                x += pt[0]
+                y += pt[1]
+            x /= len(key_pts)
+            y /= len(key_pts)
+            return (x, y)
+        else:
+            return None
     
     def heartbeat(self) -> None:
         def parse_heart(data: dict) -> str:
@@ -93,20 +103,21 @@ class SarControl():
         sleep(2)
         counter = 0
         while self.camera_up:
-            filename = f"{counter}.png"
-            self.cam(os.path.join(self.dir, filename))
-            # TODO: get drone status
-            img_dat = {
-                "speed": None,
-                "lat": None,
-                "lon": None,
-                "orient": None,
-                "height": None,
-            }
-            with open(f'{counter}.json', 'w', encoding='utf8') as file:
-                json.dump(img_dat, file)
-            counter += 1
-            time.sleep(0.7)
+            # cutoff a 20 m para evitar confundir el landing pad con el objeto
+            if self.vehicle.location.global_relative_frame > 20:
+                filename = f"{counter}.png"
+                self.cam(os.path.join(self.dir, filename))
+                img_dat = {
+                    "speed": self.vehicle.groundspeed,
+                    "lat": self.vehicle.location.global_relative_frame.lat,
+                    "lon": self.vehicle.location.global_relative_frame.lon,
+                    "heading": self.vehicle.heading,
+                    "height": self.vehicle.range_finder.distance,
+                }
+                with open(f'{counter}.json', 'w', encoding='utf8') as file:
+                    json.dump(img_dat, file)
+                counter += 1
+                time.sleep(0.7)
 
 
     def run_sar(self) -> None:
@@ -115,11 +126,7 @@ class SarControl():
         os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
         self.vehicle = connectMyCopter()
-        self.heart_thread.start()
-        #arm_takeoff(self.vehicle, self.takeoff_height)
-        #sar_out = SAR_search_pattern(self.vehicle, self.x_area, self.y_area, self.x_landpad, self.y_landpad,
-        #                                            self.search_height, self.horizontal_res, self.vertical_res,
-        #                                                self.doRTL, self.debug)
+        self.heart_thread.start()                                         self.doRTL, self.debug)
         self.camera_thread.start()
         while self.vehicle.armed:
             sleep(0.1)
@@ -135,15 +142,13 @@ class SarControl():
             query_img = cv2.imread(img_path)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
-            query_points = None
+            query_centroid = None
             if query_r:
-                query_points = query_r
-                # TODO: get centroid of query_points
+                query_centroid = query_r
                 # TODO: transform relative point to polar
                 positions['r'].append((None, None))
             elif query_n:
-                query_points = query_n
-                # TODO: get centroid of query_points
+                query_centroid = query_n
                 # TODO: transform relative point to polar
                 positions['n'].append((None, None))
         averages = {'n': None, 'r': None}
@@ -169,8 +174,6 @@ class SarControl():
             self.heart_data['nsB'] = 'S'
             self.heart_data['lonB'] = averages['n'][0]
             self.heart_data['ewB'] = 'E'
-
-
 
         self.heart_thread.join()
         self.done = True
