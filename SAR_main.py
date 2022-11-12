@@ -199,8 +199,8 @@ class SarControl():
         with open(os.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:
             json.dump(self.heart_data, file)
 
+        self.heart_up = False
         self.heart_thread.join()
-        self.heart_up = True
         self.ser_samd21.close()
         print("END OF SAR")	
 
