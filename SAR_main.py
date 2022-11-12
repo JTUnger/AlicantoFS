@@ -196,7 +196,7 @@ class SarControl():
             self.heart_data['lonB'] = averages['n'][0]
             self.heart_data['ewB'] = 'E'
         
-        with open('end_data.json', 'w', encoding='utf8') as file:
+        with open(os.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:
             json.dump(self.heart_data, file)
 
         self.heart_thread.join()
