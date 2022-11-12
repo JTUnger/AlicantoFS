@@ -27,7 +27,7 @@ class SarControl():
         self.heart_up = True
         self.camera_up = True
         self.heart_data = {
-            "status": 1,
+            "status": 2,
             "objectA": None,
             "latA": None,
             "nsA": None,
@@ -40,6 +40,7 @@ class SarControl():
             "ewB": None,
             "id": "CALCH"  # TODO: verificar id equipo
         }
+        # falta agregar un thread que monitoree el estado del dron
         self.status_values = {"Manual": 1, "Autonomous": 2, "Faulted": 3}
         self.status_format = ["objectA", "latA", "nsA", "lonA", "ewA", "objectB", "latB", "nsB", "lonB", "ewB", "id", "status", ]
         self.vehicle = None
@@ -48,6 +49,10 @@ class SarControl():
         self.camera_thread = Thread(target=self.camera)
     
     def query_sift(self, query_img: cv2.Mat, letter: str) -> np.ndarray:
+        # esta funcion toma una imagen y una letra, y revisa cual de ambas es
+        # retorna None en caso de no encontrar una respuesta o un match doble
+        # en caso de encontrar una letra, retorna el centroide de los 
+        # landmarks identificados
         kp_t = None
         good = None
         key_pts = None
@@ -80,6 +85,8 @@ class SarControl():
             return None
     
     def heartbeat(self) -> None:
+        # este thread envia el heartbeat al transmisor lora
+        # cada 1 Hz
         def parse_heart(data: dict) -> str:
             out = ""
             for val in self.status_format:
@@ -96,6 +103,9 @@ class SarControl():
             sleep(1)
     
     def camera(self) -> None:
+        # este thread toma fotos minetras el dron este a mas de 20 m
+        # y guarda un json con informacion relativa a la foto cada 2 Hz
+        # las fotos se llaman n.jpg y n.json, donde n es el numero de foto
         self.cam = PiCamera()
         self.cam.resolution = (1920, 1080)
         self.cam.color_effects = (128, 128)
@@ -121,6 +131,14 @@ class SarControl():
 
 
     def run_sar(self) -> None:
+        # esta funcion crea una carpeta con la fecha y hora actual
+        # se conecta al vehiculo, inicia el thread de la camara
+        # y el thread del heartbeat. Cuando el dron sale de estado 
+        # armed, se inicia el algoritmo de busqueda de imagenes
+        # se revisan todas las imagenes, y se promedian sus ubicaciones
+        # una vez que esto se tiene, se envia por el heartbeat 2 veces,
+        # respalda esta informacion en un archivo JSON y luego acaba
+        # el programa.
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
         os.mkdir(self.dir)
@@ -176,6 +194,9 @@ class SarControl():
             self.heart_data['nsB'] = 'S'
             self.heart_data['lonB'] = averages['n'][0]
             self.heart_data['ewB'] = 'E'
+        
+        with open('end_data.json', 'w', encoding='utf8') as file:
+            json.dump(self.heart_data, file)
 
         self.heart_thread.join()
         self.heart_up = True
