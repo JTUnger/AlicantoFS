@@ -1,4 +1,4 @@
-from flight_functions import *
+import os
 from picamera import PiCamera
 from time import sleep
 
