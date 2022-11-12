@@ -107,7 +107,7 @@ class SarControl():
         # y guarda un json con informacion relativa a la foto cada 2 Hz
         # las fotos se llaman n.jpg y n.json, donde n es el numero de foto
         self.cam = PiCamera()
-        self.cam.resolution = (1920, 1080)
+        self.cam.resolution = (self.horizontal_res, self.vertical_res)
         self.cam.color_effects = (128, 128)
         self.cam.start_preview()
         sleep(2)
