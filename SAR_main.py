@@ -123,7 +123,7 @@ class SarControl():
             sleep(0.1)
         self.camera_up = False
         self.camera_thread.join()
-        # TODO: run SIFT over images
+        positions = {'r': [], 'n': []}
         for i in range(int(len(os.listdir(self.dir))/2)):
             metadata = None
             json_path = os.path.join(os.getcwd(), f'{i}.json')
@@ -136,12 +136,38 @@ class SarControl():
             query_points = None
             if query_r:
                 query_points = query_r
+                # TODO: get centroid of query_points
+                # TODO: transform relative point to polar
+                positions['r'].append((None, None))
             elif query_n:
                 query_points = query_n
-            if query_points:
-                pass
+                # TODO: get centroid of query_points
                 # TODO: transform relative point to polar
-                # TODO: revisar el formato en que se pasan estos puntos
+                positions['n'].append((None, None))
+        averages = {'n': None, 'r': None}
+        for key in positions.keys():
+            lat = 0
+            lon = 0
+            for elem in positions[key]:
+                lat += elem[0]
+                lon += elem[1]
+            lat = lat/len(positions)
+            lon = lon/len(positions)
+            averages[key] = (lat, lon)
+        if averages['r']:
+            self.heart_data['objectA'] = 'r'
+            self.heart_data['latA'] = averages['r'][0]
+            self.heart_data['nsA'] = 'S'
+            self.heart_data['lonA'] = averages['r'][0]
+            self.heart_data['ewA'] = 'E'
+        if averages['n']:
+            self.heart_data['objectB'] = 'n'
+            self.heart_data['latB'] = averages['n'][0]
+            self.heart_data['nsB'] = 'S'
+            self.heart_data['lonB'] = averages['n'][0]
+            self.heart_data['ewB'] = 'E'
+
+
 
         self.heart_thread.join()
         self.done = True
