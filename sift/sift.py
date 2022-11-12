@@ -26,8 +26,6 @@ class SIFT(object):
         
         flann = cv2.FlannBasedMatcher(index_params, search_params)
         matches = flann.knnMatch(self.des_q, des_t, k=2)
-        print(matches[0])
-
         # store all the good matches as per Lowe's ratio test.
         temp = list(filter(lambda m: m[0].distance < 0.7*m[1].distance, matches))
         if len(temp) == 0:
@@ -37,10 +35,12 @@ class SIFT(object):
         src_pts = np.float32([ self.kp_q[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
         dst_pts = np.float32([ kp_t[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
 
-        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
-        matchesMask = mask.ravel() # only inliers
+        if len(dst_pts) > 4:
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+            matchesMask = mask.ravel() # only inliers
         
-        return kp_t, good[np.where(matchesMask == 1)]
+            return kp_t, good[np.where(matchesMask == 1)]
+        return None, None
     
 
     def get_keypoints(self, kp_t, good, max_pts=10):
@@ -67,15 +67,19 @@ if __name__ == '__main__':
     sift = SIFT()
     
     img_query = cv2.imread("letters/roboN/n0.png")  # imagen del dataset recortada
-    img_train = cv2.imread("letters/course/c0.png")  # imagen a consultar
+    img_train = cv2.imread("letters/landing/landing3.png")  # imagen a consultar
     #img_train = cv2.imread("letters/roboR/r1.png")
 
     sift.set_query_img(img_query)
+    kp_t = None
+    good = None
 
     kp_t, good = sift.get_sift_matches(img_train)
-    if kp_t and good:
-        print("Found match!")
+    if kp_t is not None and good is not None:
         key_pts = sift.get_keypoints(kp_t, good)
+        if len(key_pts) > 0:
+            print("Found match!")
+            print(key_pts)
         
         img_train_with_kp = img_train.copy()
         sift.draw_keypoints(img_train_with_kp, key_pts)

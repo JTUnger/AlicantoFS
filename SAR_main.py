@@ -48,10 +48,12 @@ class SarControl():
         self.camera_thread = Thread(target=self.camera)
     
     def query_sift(self, query_img: cv2.Mat, letter: str) -> np.ndarray:
+        kp_t = None
+        good = None
         if letter == 'r':
             self.sift.set_query_img(self.sift.robo_r)
             kp_t, good = self.sift.get_sift_matches(query_img)
-            if kp_t and good:
+            if kp_t is not None and good is not None:
                 key_pts = self.sift.get_keypoints(kp_t, good)
                 return key_pts
             else:
@@ -59,7 +61,7 @@ class SarControl():
         elif letter == 'n':
             self.sift.set_query_img(self.sift.robo_n)
             kp_t, good = self.sift.get_sift_matches(query_img)
-            if kp_t and good:
+            if kp_t is not None and good is not None:
                 key_pts = self.sift.get_keypoints(kp_t, good)
                 return key_pts
             else:
@@ -146,6 +148,7 @@ class SarControl():
                 positions['n'].append((None, None))
         averages = {'n': None, 'r': None}
         for key in positions.keys():
+            # TODO: remove outliars?
             lat = 0
             lon = 0
             for elem in positions[key]:
