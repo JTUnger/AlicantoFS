@@ -123,7 +123,7 @@ class SarControl():
                     "lat": self.vehicle.location.global_relative_frame.lat,
                     "lon": self.vehicle.location.global_relative_frame.lon,
                     "heading": self.vehicle.heading,
-                    "height": self.vehicle.range_finder.distance,
+                    "height": self.vehicle.location.global_relative_frame.alt,
                 }
                 with open(f'{counter}.json', 'w', encoding='utf8') as file:
                     json.dump(img_dat, file)
