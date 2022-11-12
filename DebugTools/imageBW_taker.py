@@ -1,6 +1,6 @@
 import os
 from picamera import PiCamera
-from time import sleep
+import time
 
 photo_id = 1
 
@@ -8,7 +8,7 @@ camera = PiCamera()
 camera.resolution = (1920, 1080)
 camera.color_effects = (128,128)
 camera.start_preview()
-sleep(2)
+time.sleep(2)
 
 while True:
     #ret, frame = cap.read()
