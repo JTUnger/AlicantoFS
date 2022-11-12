@@ -3,33 +3,77 @@ from cv_functions import *
 #from funciones_lora import *
 import exceptions
 import time 
+from threading import Thread
+from serial import Serial
+from time import sleep
 
-#Task parameters and field dimensions
-takeoff_height = 4
-x_area = 20
-y_area = 10
-x_landpad = 1
-y_landpad = 1
-search_height = 10
-horizontal_res = 1920
-vertical_res = 1080
-doRTL = True
-debug = True
+class SarControl():
+    def __init__(self, port="/dev/ttyACM0", baud=9600) -> None:
+        self.PORT = port
+        self.BAUD = baud
+        self.ser_samd21 = None
+        self.takeoff_height = 4
+        self.x_area = 6
+        self.y_area = 6
+        self.x_landpad = 1
+        self.y_landpad = 1
+        self.search_height = 6
+        self.horizontal_res = 1920
+        self.vertical_res = 1080
+        self.doRTL = False
+        self.debug = True
+        self.done = False
+        self.heart_data = {
+            "status": 1,
+            "objectA": None,
+            "latA": None,
+            "nsA": None,
+            "lonA": None,
+            "ewA": None,
+            "objectB": None,
+            "latB": None,
+            "nsB": None,
+            "lonB": None,
+            "ewB": None,
+            "id": "CALCH"  # TODO: verificar id equipo
+        }
+        self.status_values = {"Manual": 1, "Autonomous": 2, "Faulted": 3}
+        self.status_format = ["objectA", "latA", "nsA", "lonA", "ewA", "objectB", "latB", "nsB", "lonB", "ewB", "id", "status", ]
+        self.vehicle = None
+        self.heart_thread = Thread(target=self.heartbeat)
+    
+    def heartbeat(self) -> None:
+        def parse_heart(data: dict) -> str:
+            out = ""
+            for val in self.status_format:
+                if data[val] is not None:
+                    out += f"{data[val]},"
+                else:
+                    out += ","
+            return out
+        def transmit_heart(data: str) -> None:
+            self.ser_samd21.write(data.encode('utf8'))
+        while not self.done:
+            out = parse_heart(self.heart_data)
+            transmit_heart(out)
+            sleep(1)
 
-#Connect to vehicle and return Vehicle object
-vehicle = connectMyCopter()
 
-#Arm vehicle and takeoff to specified height
-arm_takeoff(vehicle, takeoff_height)
+    def run_sar(self) -> None: 
+        self.ser_samd21 = Serial(self.PORT, self.BAUD)
+        self.vehicle = connectMyCopter()
+        self.heart_thread.start()
+        arm_takeoff(self.vehicle, self.takeoff_height)
+        sar_out = SAR_search_pattern(self.vehicle, self.x_area, self.y_area, self.x_landpad, self.y_landpad,
+                                                    self.search_height, self.horizontal_res, self.vertical_res,
+                                                        self.doRTL, self.debug)
+        # TODO: revisar formato de SAR_search_pattern
 
-#Run SAR search pattern and grab images and GPS coordinates (Se que se ve horrible, pero es lo que hay)
-(photo1, photo2,
-photo1_lat, photo1_long, 
-photo2_lat, photo2_long, 
-home_lat, home_long) = SAR_search_pattern(vehicle, x_area, y_area, x_landpad, y_landpad, 
-                                            search_height, horizontal_res, vertical_res, 
-                                                doRTL, debug)
+        self.heart_thread.join()
+        self.done = True
+        self.ser_samd21.close()
+        print("END OF SAR")	
 
-#Use OpenCV to process images and return the coordinates of the target
-pass
-print("END")
+if __name__ == "__main__":
+    sar = SarControl()
+    sar.run_sar()
