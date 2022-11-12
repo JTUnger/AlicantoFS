@@ -49,5 +49,5 @@ if __name__ == "__main__":
     PORT = '/dev/ttyUSB0'
     BAUD = 9600
     print(f"Attempting to setup LoRa transceiver at {PORT}:{BAUD}")
-    sar_node = SarRos(port=PORT, baud=BAUD)
+    sar_node = UavRos(port=PORT, baud=BAUD)
     sar_node.sar_init()
