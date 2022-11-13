@@ -32,7 +32,18 @@ class SarControl():
             "ewB": None,
             "id": "CHILE"  
         }
-        # falta agregar un thread que monitoree el estado del dron
+        
+        self.camera_matrix = np.array([
+        [2339.0662877090776, 0.0, 1199.815925407665],
+        [0.0, 2367.3154724881956, 607.0957703752879],
+        [0.0, 0.0, 1.0]])
+        self.distortion_coefficients = np.array([
+            -0.4643616561067709,
+            0.32342931446046447,
+            -0.0036548702025194046,
+            -0.015751779609361322,
+            0.07829950688584723])
+
         self.status_values = {"Manual": 1, "Autonomous": 2, "Faulted": 3}
         self.status_format = ["objectA", "latA", "nsA", "lonA", "ewA", "objectB", "latB", "nsB", "lonB", "ewB", "id", "status", ]
         self.vehicle = None
