@@ -15,7 +15,7 @@ import latlon as ll_converter
     new_long = longitude + blur_factor / math.cos(latitude * 0.018)
     return new_lat, new_long'''
 
-def coordenadas_RN(width, height, vehicle_altitude, instance_image, center_image_coordinates, target_xy_coordinates, vehicle_heading):
+def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, target_xy_coordinates, vehicle_heading):
 
     cameraMatrix = np.array([[2339.0662877090776, 0, 1199.815925407665], [0, 2367.3154724881956, 607.0957703752879], [0, 0, 1]])
     distCoeffs   = np.array([-0.4643616561067709, 0.32342931446046447, -0.0036548702025194046, -0.015751779609361322, 0.07829950688584723])
@@ -41,7 +41,7 @@ def coordenadas_RN(width, height, vehicle_altitude, instance_image, center_image
     target_x_aligned = target_xy_coordinates[0] * np.cos(np.deg2rad(vehicle_heading)) - target_xy_coordinates[1] * np.sin(np.deg2rad(vehicle_heading))
     target_y_aligned = target_xy_coordinates[0] * np.sin(np.deg2rad(vehicle_heading)) + target_xy_coordinates[1] * np.cos(np.deg2rad(vehicle_heading))
 
-    target_pixels = np.asarray([target_x_aligned, target_x_aligned])
+    target_pixels = np.asarray([target_x_aligned, target_y_aligned])
 
     # Now with the orth aligned, we need to get the distance in pixels from the center
 
@@ -61,13 +61,13 @@ def coordenadas_RN(width, height, vehicle_altitude, instance_image, center_image
 
     # Now we can calculate the offset in coordinates
 
-    center_in_meters = latlon.LLtoUTM(2, center_image_coordinates[0], center_image_coordinates[1]) #RETURNS (ZONE, LONG, LAT)
+    center_in_meters = ll_converter.LLtoUTM(2, center_image_coordinates[0], center_image_coordinates[1]) #RETURNS (ZONE, LONG, LAT)
 
     latlon_meters = np.asarray([center_in_meters[2], center_in_meters[1]]) #Convenient (Lat,Lon) array
 
     coordinates_meters_with_offset = np.add(latlon_meters, offset_meters) #Add center in meters to offset in meters
 
-    offset_in_coordinates = latlon.UTMtoLL(2, coordinates_meters_with_offset[0], coordinates_meters_with_offset[1], center_in_meters[0])
+    offset_in_coordinates = ll_converter.UTMtoLL(2, coordinates_meters_with_offset[0], coordinates_meters_with_offset[1], center_in_meters[0])
     # RETURNS (LAT,LONG)
 
     return offset_in_coordinates[0], offset_in_coordinates[1]

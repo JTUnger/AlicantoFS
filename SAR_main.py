@@ -2,6 +2,8 @@ import json
 from flight_functions import *
 from cv_functions import *
 from funciones_lora import *
+from Give_RN_coordinates import coordenadas_RN
+from undistort_images import unidistort_cv2
 from picamera import PiCamera
 from threading import Thread
 from serial import Serial
@@ -10,7 +12,7 @@ from sift.sift import SIFT
 from datetime import datetime
 
 class SarControl():
-    def __init__(self, port="/dev/ttyACM0", baud=9600) -> None:
+    def __init__(self, port: str="/dev/ttyACM0", baud: int=9600) -> None:
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
@@ -170,6 +172,7 @@ class SarControl():
             with open(json_path, 'w', encoding='utf8') as file:
                 metadata = json.load(file)
             query_img = cv2.imread(img_path)
+            query_img = unidistort_cv2(query_img)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
             query_centroid = None
@@ -177,13 +180,25 @@ class SarControl():
                 pass  # descartar, R y N o esta a menos de 20 m
             elif query_r:
                 query_centroid = query_r
-                # TODO: transform relative point to polar
-                positions['r'].append((None, None))
+                lat, lon = coordenadas_RN(
+                    width=self.horizontal_res, height=self.vertical_res,
+                    vehicle_altitude=metadata['height'],
+                    center_image_coordinates=(metadata['lat'], metadata['lon']),
+                    target_xy_coordinates=query_centroid,
+                    vehicle_heading=metadata['heading']
+                )
+                positions['r'].append((lat, lon))
             elif query_n:
                 query_centroid = query_n
-                # TODO: transform relative point to polar
-                positions['n'].append((None, None))
-        averages = {'n': None, 'r': None}
+                lat, lon = coordenadas_RN(
+                    width=self.horizontal_res, height=self.vertical_res,
+                    vehicle_altitude=metadata['height'],
+                    center_image_coordinates=(metadata['lat'], metadata['lon']),
+                    target_xy_coordinates=query_centroid,
+                    vehicle_heading=metadata['heading']
+                )
+                positions['n'].append((lat, lon))
+        averages = {'n': (None, None), 'r': (None, None)}
         for key in positions.keys():
             # TODO: remove outliars?
             lat = 0
