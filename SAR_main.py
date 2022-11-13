@@ -247,5 +247,5 @@ class SarControl():
 
 if __name__ == "__main__":
     print("Starting SAR_main")
-    sar = SarControl(debug=True)
+    sar = SarControl()
     sar.run_sar()
