@@ -13,6 +13,7 @@ from datetime import datetime
 
 class SarControl():
     def __init__(self, port: str="/dev/ttyACM0", baud: int=9600) -> None:
+        print("SrtControl init!")
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
