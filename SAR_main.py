@@ -12,7 +12,7 @@ from sift.sift import SIFT
 from datetime import datetime
 
 class SarControl():
-    def __init__(self, port: str="/dev/ttyACM0", baud: int=960, debug=False) -> None:
+    def __init__(self, port: str="/dev/ttyACM0", baud: int=9600, debug=False) -> None:
         print("SrtControl init!")
         self.debug = debug
         self.PORT = port
