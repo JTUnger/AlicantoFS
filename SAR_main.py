@@ -145,7 +145,7 @@ class SarControl():
                 time.sleep(0.5)
 
 
-    def run_sar(self) -> None:
+    def run_sar(self, debug=False) -> None:
         # esta funcion crea una carpeta con la fecha y hora actual
         # se conecta al vehiculo, inicia el thread de la camara
         # y el thread del heartbeat. Cuando el dron sale de estado 
@@ -163,6 +163,8 @@ class SarControl():
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
         while not self.vehicle.armed:
+            if debug:
+                break
             print("Waiting for vehicle to arm...")
             sleep(1)
         print("Starting heart and camera threads...")
@@ -244,5 +246,5 @@ class SarControl():
 
 if __name__ == "__main__":
     print("Starting SAR_main")
-    sar = SarControl()
+    sar = SarControl(debug=True)
     sar.run_sar()
