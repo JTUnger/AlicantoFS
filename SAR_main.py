@@ -14,16 +14,8 @@ class SarControl():
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
-        self.takeoff_height = 4
-        self.x_area = 6
-        self.y_area = 6
-        self.x_landpad = 1
-        self.y_landpad = 1
-        self.search_height = 6
         self.horizontal_res = 1920
         self.vertical_res = 1080
-        self.doRTL = False
-        self.debug = True
         self.heart_up = True
         self.camera_up = True
         self.heart_data = {
@@ -150,8 +142,11 @@ class SarControl():
         self.camera_thread.start()
         while self.vehicle.armed:
             sleep(1)
-        self.camera_up = False
-        self.camera_thread.join()
+            if self.vehicle.mode.name == "LAND":
+                self.camera_up = False
+                self.camera_thread.join()
+                break
+        #Correr presland, ojo condicion de salida de presland 
         positions = {'r': [], 'n': []}
         for i in range(int(len(os.listdir(self.dir))/2)):
             metadata = None
