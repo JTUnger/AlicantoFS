@@ -31,7 +31,6 @@ for fname in images:
         imgpoints.append(corners)
 
         cv.drawChessboardCorners(img, (columns,rows), corners2, ret)
-        cv.imshow('img', img)
         cv.imwrite(f"chessboard_corners_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png", img)
         cv.waitKey(1500)
 
