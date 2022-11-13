@@ -133,6 +133,9 @@ class SarControl():
                     "lat": self.vehicle.location.global_relative_frame.lat,
                     "lon": self.vehicle.location.global_relative_frame.lon,
                     "heading": self.vehicle.heading,
+                    "pitch": self.vehicle.attitude.pitch,
+                    "roll": self.vehicle.attitude.roll,
+                    "yaw": self.vehicle.attitude.yaw,
                     "height": self.vehicle.location.global_relative_frame.alt,
                 }
                 with open(f'{counter}.json', 'w', encoding='utf8') as file:
