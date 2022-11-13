@@ -155,6 +155,8 @@ class SarControl():
         os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
         self.vehicle = connectMyCopter()
+        while not self.vehicle.armed:
+            sleep(1)
         self.heart_thread.start()
         self.camera_thread.start()
         while self.vehicle.armed:
