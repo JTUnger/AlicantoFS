@@ -1,7 +1,7 @@
 import json
 from flight_functions import *
 from cv_functions import *
-#from funciones_lora import *
+from funciones_lora import *
 from picamera import PiCamera
 from threading import Thread
 from serial import Serial
@@ -30,7 +30,7 @@ class SarControl():
             "nsB": None,
             "lonB": None,
             "ewB": None,
-            "id": "CALCH"  # TODO: verificar id equipo
+            "id": "CHILE"  
         }
         # falta agregar un thread que monitoree el estado del dron
         self.status_values = {"Manual": 1, "Autonomous": 2, "Faulted": 3}
@@ -79,7 +79,10 @@ class SarControl():
     def heartbeat(self) -> None:
         # este thread envia el heartbeat al transmisor lora
         # cada 1 Hz
-        # TODO: integrar vehicle status aca
+        def update_vehicle_status() -> None:
+            current_status = reportar_status_SAR(self.vehicle)
+            self.heart_data["status"] = self.status_values[current_status]
+        
         def parse_heart(data: dict) -> str:
             out = ""
             for val in self.status_format:
@@ -91,6 +94,7 @@ class SarControl():
         def transmit_heart(data: str) -> None:
             self.ser_samd21.write(data.encode('utf8'))
         while self.heart_up:
+            update_vehicle_status()
             out = parse_heart(self.heart_data)
             transmit_heart(out)
             sleep(1)
