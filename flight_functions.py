@@ -366,6 +366,53 @@ def aruco_precision_landing(vehicle, id_aruco = 72, size_aruco_cm = 19,
         print("All landing attempts completed, vehicle still armed, aborting")
         raise LandingError("Precision Landing Failed")
 
+def landingpad_precision_landing(vehicle):
+    """Searches for the landingpad circle and sends precision landing information to the autopilot.
+    Dont run in a loop, call function once. """
+    
+    #Camera Parameters 
+    horizontal_res = 800
+    vertical_res = 600
+    horizontal_fov = 59 * (math.pi/180)
+    vertical_fov = 46 * (math.pi/180)
+
+    #Start video capture
+    capture = WebcamVideoStream(height = vertical_res, width = horizontal_res).start()
+
+    #Camera Intrinsics
+    cameraMatrix   = np.array([[933.9466925521707, 0, 358.59608943398365],
+                [0, 935.0635463990791, 293.0721064675127],
+                [0, 0, 1]])
+    cameraDistortion   = np.array([-0.4530790972005633, 0.3951099938612813, 0.0037673873203789916, 
+                                    0.0016363264710513889, -0.38177331299300393])
+
+    #Set Vehicle Parameters
+    vehicle.parameters['PLND_ENABLED'] = 1
+    vehicle.parameters['PLND_TYPE'] = 1 
+    vehicle.parameters['PLND_EST_TYPE'] = 0 ##0 for raw sensor, 1 for kalman filter pos estimation
+    vehicle.parameters['LAND_SPEED'] = 30 ##Descent speed of 20cm/s
+
+    while vehicle.armed == True:
+        #Capture frame and flip to correct orientation and prep
+        frame = capture.read()
+        frame = cv2.flip(frame, 0)
+        frame = cv2.flip(frame, 1)
+        frame = cv2.resize(frame, (horizontal_res, vertical_res))
+        frame = cv2.undistort(frame, cameraMatrix, cameraDistortion)
+        frame_np = np.array(frame)
+        gray_img = cv2.cvtColor(frame_np, cv2.COLOR_BGR2GRAY)
+        circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+        if circles is not None:
+            #Get the x,y coordinates of the center of mass of the circle
+            x_center = circles[0]
+            y_center = circles[1]
+            #Calculate the angle of the circle from the center of the image
+            x_angle = (x_center - horizontal_res/2) * (horizontal_fov / horizontal_res)
+            y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
+            #Send precision landing information to the autopilot
+            send_land_message(vehicle, x_angle, y_angle)
+            print("X CENTER OF CIRCLE: ", x_center + "Y CENTER OF CIRCLE: ", y_center)
+
 def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aruco = 72, size_aruco_cm = 20):
     """Vehicle comes down to loiter_height and looks for aruco marker with the correct id_aruco, if marker is found,
     vehicle moves to marker and loiters at loiter_height. Vehicle loiters for loiter_time seconds and then sets its mode to guided.
