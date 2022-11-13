@@ -154,7 +154,7 @@ class SarControl():
         # una vez que esto se tiene, se envia por el heartbeat 2 veces,
         # respalda esta informacion en un archivo JSON y luego acaba
         # el programa.
-        print("Starting SAR_main")
+        print("Running SAR mission")
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
         os.mkdir(self.dir)
@@ -243,5 +243,6 @@ class SarControl():
         print("END OF SAR")	
 
 if __name__ == "__main__":
+    print("Starting SAR_main")
     sar = SarControl()
     sar.run_sar()
