@@ -54,7 +54,7 @@ class SarControl():
         self.heart_thread = Thread(target=self.heartbeat)
         self.camera_thread = Thread(target=self.camera)
     
-    def query_sift(self, query_img: cv2.Mat, letter: str) -> tuple:
+    def query_sift(self, query_img, letter):
         # esta funcion toma una imagen y una letra, y revisa cual de ambas es
         # retorna None en caso de no encontrar una respuesta o un match doble
         # en caso de encontrar una letra, retorna el centroide de los 

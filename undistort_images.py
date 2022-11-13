@@ -8,7 +8,7 @@ import os
 
 ## Reference: https://stackoverflow.com/questions/62923212/python-opencv-how-to-get-an-undistorted-image-without-the-cropping
 
-def unidistort_cv2(image: cv2.Mat) -> cv2.Mat:
+def unidistort_cv2(image):
   cameraMatrix = np.array([[2339.0662877090776, 0, 1199.815925407665], [0, 2367.3154724881956, 607.0957703752879], [0, 0, 1]])
   distCoeffs   = np.array([-0.4643616561067709, 0.32342931446046447, -0.0036548702025194046, -0.015751779609361322, 0.07829950688584723])
   R = np.array([[1,0,0],[0,1,0],[0,0,1]])
