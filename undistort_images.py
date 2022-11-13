@@ -30,5 +30,5 @@ def loadUndistortedImage(fileName):
   cv2.imwrite(os.path.join(save_path, save_name), undistorted_image)
   return
 
-#Undistort the images, then save the restored images
-loadUndistortedImage(r'C:\Users\Adminitrador\Desktop\mm\ajsdlksajdl\photo_31_17.426.png')
+# Undistort the images, then save the restored images
+# loadUndistortedImage(r'C:\Users\Adminitrador\Desktop\mm\ajsdlksajdl\photo_31_17.426.png')
