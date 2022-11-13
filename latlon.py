@@ -207,7 +207,7 @@ def UTMtoLL(ReferenceEllipsoid, northing, easting, zone):
     return (Lat, Long)
 
 if __name__ == '__main__':
-
+    pass
     ## z = 2 -> Australian ellipsoid
     ## e = 
 
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     #North latitudes are positive, South latitudes are negative
     #Lat and Long are in decimal degrees. 
 
-    (z, e, n) = LLtoUTM(2, -33.7223124, 150.6711260)
-    print(z, e, n)
-    (lat, lon) = UTMtoLL(2, n, e, z)   #### OFFSET POSITIVO EN E MUEVE HACIA LA IZQUIERDA (AL OESTE) -> MUEVE LA LONGITUD
-    print(f'{lat}, {lon}')             #### OFFSET POSITIVO EN N MUEVE HACIA ARRIBA (AL NORTE) -> MUEVE LA LATITUD
+    #(z, e, n) = LLtoUTM(2, -33.7223124, 150.6711260)
+    #print(z, e, n)
+    #(lat, lon) = UTMtoLL(2, n, e, z)   #### OFFSET POSITIVO EN E MUEVE HACIA LA IZQUIERDA (AL OESTE) -> MUEVE LA LONGITUD
+    #print(f'{lat}, {lon}')             #### OFFSET POSITIVO EN N MUEVE HACIA ARRIBA (AL NORTE) -> MUEVE LA LATITUD

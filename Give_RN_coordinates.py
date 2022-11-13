@@ -4,6 +4,8 @@ import numpy as np
 
 import scipy as sp
 
+import latlon as ll_converter
+
 '''def add_offset(latitude, longitude):
     meters = 10
     earth_radius_in_km = 6378.137
@@ -59,5 +61,15 @@ def coordenadas_RN(width, height, vehicle_altitude, instance_image, center_image
 
     # Now we can calculate the offset in coordinates
 
-    return longitude,  latitude
+    center_in_meters = latlon.LLtoUTM(2, center_image_coordinates[0], center_image_coordinates[1]) #RETURNS (ZONE, LONG, LAT)
+
+    latlon_meters = np.asarray([center_in_meters[2], center_in_meters[1]]) #Convenient (Lat,Lon) array
+
+    coordinates_meters_with_offset = np.add(latlon_meters, offset_meters) #Add center in meters to offset in meters
+
+    offset_in_coordinates = latlon.UTMtoLL(2, coordinates_meters_with_offset[0], coordinates_meters_with_offset[1], center_in_meters[0])
+    # RETURNS (LAT,LONG)
+
+    return offset_in_coordinates[0], offset_in_coordinates[1]
+    
 
