@@ -404,8 +404,8 @@ def landingpad_precision_landing(vehicle):
         circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=10, param2=3, minRadius=0, maxRadius=0)
         if circles is not None:
             #Get the x,y coordinates of the center of mass of the circle
-            x_center = circles[0]
-            y_center = circles[1]
+            x_center = circles[0][0]
+            y_center = circles[0][1]
             #Calculate the angle of the circle from the center of the image
             x_angle = (x_center - horizontal_res/2) * (horizontal_fov / horizontal_res)
             y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
