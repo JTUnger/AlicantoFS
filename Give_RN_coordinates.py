@@ -2,7 +2,7 @@ import cv2
 
 import numpy as np
 
-import scipy as sp
+# import scipy as sp
 
 import latlon as ll_converter
 
