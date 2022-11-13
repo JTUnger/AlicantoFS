@@ -12,8 +12,9 @@ from sift.sift import SIFT
 from datetime import datetime
 
 class SarControl():
-    def __init__(self, port: str="/dev/ttyACM0", baud: int=9600) -> None:
+    def __init__(self, port: str="/dev/ttyACM0", baud: int=960, debug=False) -> None:
         print("SrtControl init!")
+        self.debug = debug
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
@@ -145,7 +146,7 @@ class SarControl():
                 time.sleep(0.5)
 
 
-    def run_sar(self, debug=False) -> None:
+    def run_sar(self) -> None:
         # esta funcion crea una carpeta con la fecha y hora actual
         # se conecta al vehiculo, inicia el thread de la camara
         # y el thread del heartbeat. Cuando el dron sale de estado 
@@ -163,7 +164,7 @@ class SarControl():
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
         while not self.vehicle.armed:
-            if debug:
+            if self.debug:
                 break
             print("Waiting for vehicle to arm...")
             sleep(1)
