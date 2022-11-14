@@ -10,6 +10,7 @@ from serial import Serial
 from time import sleep
 from sift.sift import SIFT
 from datetime import datetime
+import logging
 
 class SarControl():
     def __init__(self, port: str="/dev/ttyACM0", baud: int=9600, debug=False) -> None:
@@ -253,6 +254,9 @@ class SarControl():
         print("END OF SAR")	
 
 if __name__ == "__main__":
-    print("Starting SAR_main")
-    sar = SarControl()
-    sar.run_sar()
+    try:
+        print("Starting SAR_main")
+        sar = SarControl()
+        sar.run_sar()
+    except Exception as Argument:
+        logging.exception(Argument)
