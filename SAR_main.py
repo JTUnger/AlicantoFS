@@ -108,12 +108,14 @@ class SarControl():
                     out += ","
             return out
         def transmit_heart(data: str) -> None:
+            print(f"Transmitiendo: {data}")
             self.ser_samd21.write(data.encode('utf8'))
         while self.heart_up:
             update_vehicle_status()
             out = parse_heart(self.heart_data)
             transmit_heart(out)
             sleep(1)
+        print("Stopping heartbeat thread")
     
     def camera(self) -> None:
         # este thread toma fotos minetras el dron este a mas de 20 m
@@ -127,7 +129,7 @@ class SarControl():
         counter = 0
         while self.camera_up:
             # cutoff a 20 m para evitar confundir el landing pad con el objeto
-            if self.vehicle.location.global_relative_frame.alt > 20.0:
+            if self.vehicle.location.global_relative_frame.alt > 20.0 and not self.debug:
                 filename = f"{counter}.png"
                 # TODO: plug undistort on {counter}.png
                 self.cam(os.path.join(self.dir, filename))
@@ -145,6 +147,7 @@ class SarControl():
                     json.dump(img_dat, file)
                 counter += 1
                 time.sleep(0.5)
+        print("Stopping camera thread!")
 
 
     def run_sar(self) -> None:
@@ -166,8 +169,8 @@ class SarControl():
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
         self.ser_samd21.write("Connected to Vehicle!".encode('utf8'))
-        print("Starting camera thread")
-        self.ser_samd21.write("Starting camera thread!".encode('utf8'))
+        print("Starting heart thread")
+        self.ser_samd21.write("Starting heart thread!".encode('utf8'))
         self.heart_thread.start()
         while not self.vehicle.armed:
             if self.debug:
