@@ -22,7 +22,7 @@ def centroide(momentos):
 #### Inputs
 
 
-image = cv2.imread(r'C:\Users\gseml\OneDrive\Documentos\Universidad\2022-2\Team_Drones\SaR\ss1.jpg')
+image = cv2.imread(r'C:\Users\Adminitrador\Desktop\mm\SARPhotos_BW_2\photo_rectificado_1.jpg')
 lat_lon = np.asarray([[-36.0000000, -70.0000000]])
 #############################################################
 
@@ -36,12 +36,12 @@ hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 
 #HSV limits
-lower_orange = np.array([0, 60, 0], dtype = "uint8") 
+lower_orange = np.array([0, 0, 0], dtype = "uint8") 
 
-upper_orange= np.array([10, 255, 255], dtype = "uint8")
+upper_orange= np.array([255, 255, 255], dtype = "uint8")
 
 
-mask = cv2.inRange(hsv_image, lower_orange, upper_orange)
+mask = cv2.inRange(image, 0, 255)
 
 detected_output = cv2.bitwise_and(image, image, mask =  mask) 
 
@@ -59,7 +59,7 @@ total = 0
 
 size_contours = []
 momentos = []
-
+'''
 for c in cnts:
     x,y,w,h = cv2.boundingRect(c)
     mask = np.zeros(hsv_image.shape, dtype=np.uint8)
@@ -92,45 +92,41 @@ m_por_pixel = 10/np.min(dist_matrix)
 tasa_m_cord = 110000 
 
 lat_lon = np.asarray([[-36.0000000, -70.0000000]])
-
+'''
 
 ##### output
-posicion_conos_cord = (posicion_conos - img_cntr)*m_por_pixel/tasa_m_cord + lat_lon 
+#posicion_conos_cord = (posicion_conos - img_cntr)*m_por_pixel/tasa_m_cord + lat_lon 
 
 
-print(posicion_conos_cord)
+#print(posicion_conos_cord)
 
 
 ##############################################################################3
 
-#cv2.drawContours(image, contours_conos, -1, (255,0,0),10)
+'''cv2.drawContours(image, contours_conos, -1, (255,0,0),10)
 
 
 
-#cv2.imshow('thresh', thresh)
-#cv2.imshow('image', image)
-#cv2.imshow('copia', copia)
+cv2.imshow('thresh', thresh)
+cv2.imshow('image', image)
+cv2.imshow('copia', copia)
 
-#cv2.imshow("red color detection", detected_output) 
-#cv2.waitKey(0)
-
-
+cv2.imshow("red color detection", detected_output) 
+cv2.waitKey(0)'''
 
 
 
-''''
+
+
+
 print(total)
 cv2.imshow('thresh', thresh)
 cv2.imshow('image', image)
 cv2.waitKey(0)
 
-print('Moments: ', M1)
-print('Output Detected')
+#print('Moments: ', M1)
+#print('Output Detected')
 cv2.imshow("red color detection", detected_output) 
 
 cv2.waitKey(0)
-
-
-'''
-
 
