@@ -265,3 +265,6 @@ if __name__ == "__main__":
         sar.run_sar()
     except Exception as Argument:
         logging.exception(Argument)
+        f = open("log.txt", "a")
+        f.write(str(Argument))
+        f.close()
