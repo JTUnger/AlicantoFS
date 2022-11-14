@@ -166,6 +166,9 @@ class SarControl():
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
         self.ser_samd21.write("Connected to Vehicle!".encode('utf8'))
+        print("Starting camera thread")
+        self.ser_samd21.write("Starting camera thread!".encode('utf8'))
+        self.heart_thread.start()
         while not self.vehicle.armed:
             if self.debug:
                 break
@@ -173,8 +176,7 @@ class SarControl():
             self.ser_samd21.write("Waiting for vehicle to arm...".encode('utf8'))
             sleep(1)
         print("Starting heart and camera threads...")
-        self.ser_samd21.write("Starting heart and camera threads..".encode('utf8'))
-        self.heart_thread.start()
+        self.ser_samd21.write("Starting camera thread..".encode('utf8'))
         self.camera_thread.start()
         while self.vehicle.armed:
             self.ser_samd21.write("Vehicle is armed!".encode('utf8'))
