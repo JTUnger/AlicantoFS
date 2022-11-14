@@ -79,11 +79,9 @@ class PitchTest():
         # respalda esta informacion en un archivo JSON y luego acaba
         # el programa.
         print("Running pitch test mission")
-        foldername = f"pitch_test"
+        foldername = "pitch_test"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
         os.mkdir(self.dir)
-        self.ser_samd21 = Serial(self.PORT, self.BAUD)
-        print(f"Connected to LoRa on {self.PORT}:{self.BAUD}")
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
         self.camera()
