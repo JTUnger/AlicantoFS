@@ -177,7 +177,7 @@ class SarControl():
                 self.camera_up = False
                 self.camera_thread.join()
                 break
-        #landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
+        landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
         print("Processing images...")
         for i in range(int(len(os.listdir(self.dir))/2)):
