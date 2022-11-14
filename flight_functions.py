@@ -12,6 +12,7 @@ from imutils.video import WebcamVideoStream
 import imutils
 import datetime
 import os
+from landing.landing_target import hough_target
 
 def connectMyCopter():
     """ Connects to drone and returns vehicle object, takes argument "connect" 
@@ -401,7 +402,7 @@ def landingpad_precision_landing(vehicle):
         frame = cv2.undistort(frame, cameraMatrix, cameraDistortion)
         frame_np = np.array(frame)
         gray_img = cv2.cvtColor(frame_np, cv2.COLOR_BGR2GRAY)
-        x_center, y_center = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=50, minRadius=0, maxRadius=0)
+        x_center, y_center = hough_target(gray_img)
         if x_center is not None and y_center is not None:
             #Calculate the angle of the circle from the center of the image
             x_angle = (x_center - horizontal_res/2) * (horizontal_fov / horizontal_res)
