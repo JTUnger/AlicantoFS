@@ -178,7 +178,7 @@ class SarControl():
             print("Waiting for vehicle to arm...")
             self.ser_samd21.write("Waiting for vehicle to arm...".encode('utf8'))
             sleep(1)
-        print("Starting heart and camera threads...")
+        print("Starting camera thread...")
         self.ser_samd21.write("Starting camera thread..".encode('utf8'))
         self.camera_thread.start()
         while self.vehicle.armed:
@@ -186,6 +186,7 @@ class SarControl():
             sleep(1)
             if self.vehicle.mode.name == "LAND":
                 self.ser_samd21.write("Vehicle is landing!".encode('utf8'))                
+                print("Vehicle is landing!")
                 self.camera_up = False
                 self.camera_thread.join()
                 break
