@@ -161,25 +161,32 @@ class SarControl():
         os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
         print(f"Connected to LoRa on {self.PORT}:{self.BAUD}")
+        self.ser_samd21.write("Connected to LoRa!".encode('utf8'))
         self.vehicle = connectMyCopter()
         print("Connected to vehicle!")
+        self.ser_samd21.write("Connected to Vehicle!".encode('utf8'))
         while not self.vehicle.armed:
             if self.debug:
                 break
             print("Waiting for vehicle to arm...")
+            self.ser_samd21.write("Waiting for vehicle to arm...".encode('utf8'))
             sleep(1)
         print("Starting heart and camera threads...")
+        self.ser_samd21.write("Starting heart and camera threads..".encode('utf8'))
         self.heart_thread.start()
         self.camera_thread.start()
         while self.vehicle.armed:
+            self.ser_samd21.write("Vehicle is armed!".encode('utf8'))
             sleep(1)
             if self.vehicle.mode.name == "LAND":
+                self.ser_samd21.write("Vehicle is landing!".encode('utf8'))                
                 self.camera_up = False
                 self.camera_thread.join()
                 break
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
         print("Processing images...")
+        self.ser_samd21.write("Processing images...".encode('utf8'))                
         for i in range(int(len(os.listdir(self.dir))/2)):
             metadata = None
             json_path = os.path.join(os.getcwd(), f'{i}.json')
