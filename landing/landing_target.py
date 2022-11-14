@@ -28,16 +28,17 @@ def hough_target(image):
     dilate = cv2.dilate(canny, kernel, iterations=1)
     circles = cv2.HoughCircles(dilate,cv2.HOUGH_GRADIENT_ALT,1,20,
                                 param1=200,param2=0.7,minRadius=0,maxRadius=-1)
-    circles = np.uint16(np.around(circles))
-    x_avg = 0
-    y_avg = 0
-    if len(circles[0,:]) > 0:
-        for circle in circles[0,:]:
-            ## get averge of the circle center
-            x_avg += circle[0]
-            y_avg += circle[1]
-        x_avg = x_avg/len(circles[0,:])
-        y_avg = y_avg/len(circles[0,:])
-        return x_avg, y_avg
+    if circles:
+        circles = np.uint16(np.around(circles))
+        x_avg = 0
+        y_avg = 0
+        if len(circles[0,:]) > 0:
+            for circle in circles[0,:]:
+                ## get averge of the circle center
+                x_avg += circle[0]
+                y_avg += circle[1]
+            x_avg = x_avg/len(circles[0,:])
+            y_avg = y_avg/len(circles[0,:])
+            return x_avg, y_avg
     else:
         return None, None

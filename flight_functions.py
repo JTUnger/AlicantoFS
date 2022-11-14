@@ -409,7 +409,7 @@ def landingpad_precision_landing(vehicle):
             y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
             #Send precision landing information to the autopilot
             send_land_message(vehicle, x_angle, y_angle)
-            print("X CENTER OF CIRCLE: ", x_center + "Y CENTER OF CIRCLE: ", y_center)
+            print(f"X CENTER OF CIRCLE: {x_center} Y CENTER OF CIRCLE: {y_center}")
 
 def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aruco = 72, size_aruco_cm = 20):
     """Vehicle comes down to loiter_height and looks for aruco marker with the correct id_aruco, if marker is found,
