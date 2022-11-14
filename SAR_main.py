@@ -132,7 +132,7 @@ class SarControl():
             if self.vehicle.location.global_relative_frame.alt > 20.0 and not self.debug:
                 filename = f"{counter}.png"
                 # TODO: plug undistort on {counter}.png
-                self.cam(os.path.join(self.dir, filename))
+                self.cam.capture(os.path.join(self.dir, filename))
                 img_dat = {
                     "speed": self.vehicle.groundspeed,
                     "lat": self.vehicle.location.global_relative_frame.lat,
