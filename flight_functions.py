@@ -401,12 +401,8 @@ def landingpad_precision_landing(vehicle):
         frame = cv2.undistort(frame, cameraMatrix, cameraDistortion)
         frame_np = np.array(frame)
         gray_img = cv2.cvtColor(frame_np, cv2.COLOR_BGR2GRAY)
-        circles = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=50, minRadius=0, maxRadius=0)
-        if circles is not None:
-            #Get the x,y coordinates of the center of mass of the circle
-            print(circles)
-            x_center = circles[0][0]
-            y_center = circles[0][1]
+        x_center, y_center = cv2.HoughCircles(gray_img, cv2.HOUGH_GRADIENT, 1, 20, param1=100, param2=50, minRadius=0, maxRadius=0)
+        if x_center is not None and y_center is not None:
             #Calculate the angle of the circle from the center of the image
             x_angle = (x_center - horizontal_res/2) * (horizontal_fov / horizontal_res)
             y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
