@@ -56,16 +56,16 @@ def reportar_status_HEARTBEAT(vehicle):
 
 ################### Ejecutable ############################
 
-ser = serial.Serial('/dev/ttyACM0',9600)
-ser.flush()
+# ser = serial.Serial('/dev/ttyACM0',9600)
+# ser.flush()
 
-while True:
+# while True:
 	
-	lat = round(random.uniform(35, 36), 8)
-	lon = round(random.uniform(35, 36), 8)
-	stri = "Latitud: "+str(lat) + "; Longitud: "+ str(lon) 
-	send_and_recieve_data(stri)
-	#send_data(time.time())
+# 	lat = round(random.uniform(35, 36), 8)
+# 	lon = round(random.uniform(35, 36), 8)
+# 	stri = "Latitud: "+str(lat) + "; Longitud: "+ str(lon) 
+# 	send_and_recieve_data(stri)
+# 	#send_data(time.time())
 
 
 

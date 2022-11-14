@@ -29,6 +29,7 @@ class UavRos():
             return out
         _, *data = data
         out['data'] = ','.join(data)
+        out['data'] = out['data']+'\n\r'
         return out
     
     def loop(self) -> None:

@@ -2,6 +2,8 @@ import json
 from flight_functions import *
 from cv_functions import *
 from funciones_lora import *
+from Give_RN_coordinates import coordenadas_RN
+from undistort_images import unidistort_cv2
 from picamera import PiCamera
 from threading import Thread
 from serial import Serial
@@ -10,7 +12,9 @@ from sift.sift import SIFT
 from datetime import datetime
 
 class SarControl():
-    def __init__(self, port="/dev/ttyACM0", baud=9600) -> None:
+    def __init__(self, port: str="/dev/ttyACM0", baud: int=9600, debug=False) -> None:
+        print("SrtControl init!")
+        self.debug = debug
         self.PORT = port
         self.BAUD = baud
         self.ser_samd21 = None
@@ -51,7 +55,7 @@ class SarControl():
         self.heart_thread = Thread(target=self.heartbeat)
         self.camera_thread = Thread(target=self.camera)
     
-    def query_sift(self, query_img: cv2.Mat, letter: str) -> tuple:
+    def query_sift(self, query_img, letter):
         # esta funcion toma una imagen y una letra, y revisa cual de ambas es
         # retorna None en caso de no encontrar una respuesta o un match doble
         # en caso de encontrar una letra, retorna el centroide de los 
@@ -131,6 +135,9 @@ class SarControl():
                     "lat": self.vehicle.location.global_relative_frame.lat,
                     "lon": self.vehicle.location.global_relative_frame.lon,
                     "heading": self.vehicle.heading,
+                    "pitch": self.vehicle.attitude.pitch,
+                    "roll": self.vehicle.attitude.roll,
+                    "yaw": self.vehicle.attitude.yaw,
                     "height": self.vehicle.location.global_relative_frame.alt,
                 }
                 with open(f'{counter}.json', 'w', encoding='utf8') as file:
@@ -148,11 +155,20 @@ class SarControl():
         # una vez que esto se tiene, se envia por el heartbeat 2 veces,
         # respalda esta informacion en un archivo JSON y luego acaba
         # el programa.
+        print("Running SAR mission")
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
         os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
+        print(f"Connected to LoRa on {self.PORT}:{self.BAUD}")
         self.vehicle = connectMyCopter()
+        print("Connected to vehicle!")
+        while not self.vehicle.armed:
+            if self.debug:
+                break
+            print("Waiting for vehicle to arm...")
+            sleep(1)
+        print("Starting heart and camera threads...")
         self.heart_thread.start()
         self.camera_thread.start()
         while self.vehicle.armed:
@@ -163,6 +179,7 @@ class SarControl():
                 break
         #landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
+        print("Processing images...")
         for i in range(int(len(os.listdir(self.dir))/2)):
             metadata = None
             json_path = os.path.join(os.getcwd(), f'{i}.json')
@@ -170,6 +187,7 @@ class SarControl():
             with open(json_path, 'w', encoding='utf8') as file:
                 metadata = json.load(file)
             query_img = cv2.imread(img_path)
+            query_img = unidistort_cv2(query_img)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
             query_centroid = None
@@ -177,13 +195,25 @@ class SarControl():
                 pass  # descartar, R y N o esta a menos de 20 m
             elif query_r:
                 query_centroid = query_r
-                # TODO: transform relative point to polar
-                positions['r'].append((None, None))
+                lat, lon = coordenadas_RN(
+                    width=self.horizontal_res, height=self.vertical_res,
+                    vehicle_altitude=metadata['height'],
+                    center_image_coordinates=(metadata['lat'], metadata['lon']),
+                    target_xy_coordinates=query_centroid,
+                    vehicle_heading=metadata['heading']
+                )
+                positions['r'].append((lat, lon))
             elif query_n:
                 query_centroid = query_n
-                # TODO: transform relative point to polar
-                positions['n'].append((None, None))
-        averages = {'n': None, 'r': None}
+                lat, lon = coordenadas_RN(
+                    width=self.horizontal_res, height=self.vertical_res,
+                    vehicle_altitude=metadata['height'],
+                    center_image_coordinates=(metadata['lat'], metadata['lon']),
+                    target_xy_coordinates=query_centroid,
+                    vehicle_heading=metadata['heading']
+                )
+                positions['n'].append((lat, lon))
+        averages = {'n': (None, None), 'r': (None, None)}
         for key in positions.keys():
             # TODO: remove outliars?
             lat = 0
@@ -207,7 +237,7 @@ class SarControl():
             self.heart_data['lonB'] = averages['n'][0]
             self.heart_data['ewB'] = 'E'
         
-        with open(os.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:
+        with open(os.path.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:
             json.dump(self.heart_data, file)
 
         self.heart_up = False
@@ -216,5 +246,6 @@ class SarControl():
         print("END OF SAR")	
 
 if __name__ == "__main__":
+    print("Starting SAR_main")
     sar = SarControl()
     sar.run_sar()
