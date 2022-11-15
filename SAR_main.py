@@ -82,7 +82,7 @@ class SarControl():
                 return None
         else:
             raise ValueError("Letter must be 'n' or 'r'")
-        if key_pts is not None:
+        if len(key_pts) > 0: #Atento aca, esta entrando cuando no deberia
             x = 0
             y = 0
             for pt in key_pts:
@@ -240,8 +240,9 @@ class SarControl():
             query_img = unidistort_cv2(query_img)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
+            print("Sift Query done")
             query_centroid = None
-            if (query_r and query_n) or metadata["height"] < 20.0:
+            if (query_r and query_n) or (metadata["height"] < 20.0 and not self.debug):
                 pass  # descartar, R y N o esta a menos de 20 m
             elif query_r:
                 query_centroid = query_r
@@ -278,13 +279,13 @@ class SarControl():
             self.heart_data['objectA'] = 'r'
             self.heart_data['latA'] = averages['r'][0]
             self.heart_data['nsA'] = 'S'
-            self.heart_data['lonA'] = averages['r'][0]
+            self.heart_data['lonA'] = averages['r'][1]
             self.heart_data['ewA'] = 'E'
         if averages['n']:
             self.heart_data['objectB'] = 'n'
             self.heart_data['latB'] = averages['n'][0]
             self.heart_data['nsB'] = 'S'
-            self.heart_data['lonB'] = averages['n'][0]
+            self.heart_data['lonB'] = averages['n'][1]
             self.heart_data['ewB'] = 'E'
         
         with open(os.path.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:

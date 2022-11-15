@@ -41,13 +41,18 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
     target_x_aligned = target_xy_coordinates[0] * np.cos(np.deg2rad(vehicle_heading)) - target_xy_coordinates[1] * np.sin(np.deg2rad(vehicle_heading))
     target_y_aligned = target_xy_coordinates[0] * np.sin(np.deg2rad(vehicle_heading)) + target_xy_coordinates[1] * np.cos(np.deg2rad(vehicle_heading))
 
+    #print(f'target_x_aligned: {target_x_aligned}')
+    #print(f'target_y_aligned: {target_y_aligned}')
+
     target_pixels = np.asarray([target_x_aligned, target_y_aligned])
 
     # Now with the orth aligned, we need to get the distance in pixels from the center
 
-    offset_pixels = np.substract(target_pixels, img_center_pixels)
+    offset_pixels = np.subtract(target_pixels, img_center_pixels)
 
-    offset_pixels = np.asarray([offset_pixels[0] *-1, offset_pixels[1]])
+    #print(f'offset pixels: {offset_pixels}')
+
+    offset_pixels = np.asarray([offset_pixels[0], offset_pixels[1]])
 
     # We will calculate relationship between a pixel and meters
     #This transforms pixels to meters (this is the scale factor)
@@ -57,20 +62,32 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
 
     scale_factor = np.asarray([pixel_to_m_x, pixel_to_m_y])
 
+    #print(f'scale factor: {scale_factor}')
+
     #Transform pixel distance to meters
 
     offset_meters = np.multiply(offset_pixels, scale_factor)
 
+    #print(f'offset meters: {offset_meters}')
+
     # Now we can calculate the offset in coordinates
 
-    center_in_meters = ll_converter.LLtoUTM(2, center_image_coordinates[1], center_image_coordinates[0]) #RETURNS (ZONE, LONG, LAT)
+    center_in_meters = ll_converter.LLtoUTM(2, center_image_coordinates[0], center_image_coordinates[1]) #RETURNS (ZONE, EASTING, NORTHING)
+
+    #print(f'center in meters: {center_in_meters}')
 
     latlon_meters = np.asarray([center_in_meters[2], center_in_meters[1]]) #Convenient (Lat,Lon) array
 
+    #print(f'latlon meters: {latlon_meters}')
+
     coordinates_meters_with_offset = np.add(latlon_meters, offset_meters) #Add center in meters to offset in meters
+
+    #print(f'coordinates_meters_with_offset: {coordinates_meters_with_offset}')
 
     offset_in_coordinates = ll_converter.UTMtoLL(2, coordinates_meters_with_offset[0], coordinates_meters_with_offset[1], center_in_meters[0])
     # RETURNS (LAT,LONG)
+
+    #print(f'offset_in_coordinates: {offset_in_coordinates}')
 
     return offset_in_coordinates[0], offset_in_coordinates[1]
     
