@@ -27,7 +27,7 @@ def reportar_status_SAR(vehicle):
 	if vehicle.system_status == "EMERGENCY" or vehicle.system_status == "CRITICAL":
 		return "Faulted"
 
-	if vehicle.mode.name == "GUIDED" or vehicle.mode.name == "RTL" or vehicle.mode.name == "LAND":
+	if vehicle.mode.name == "GUIDED" or vehicle.mode.name == "RTL" or vehicle.mode.name == "LAND" or vehicle.mode.name == "AUTO":
 		return "Autonomous"
 
 	elif vehicle.mode.name == "STABILIZE" or vehicle.mode.name == "POSHOLD":
