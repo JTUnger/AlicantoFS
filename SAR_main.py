@@ -240,8 +240,9 @@ class SarControl():
             query_img = unidistort_cv2(query_img)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
+            print("Sift Query done")
             query_centroid = None
-            if (query_r and query_n) or metadata["height"] < 20.0:
+            if (query_r and query_n) or (metadata["height"] < 20.0 and not self.debug):
                 pass  # descartar, R y N o esta a menos de 20 m
             elif query_r:
                 query_centroid = query_r
