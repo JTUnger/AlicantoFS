@@ -232,8 +232,8 @@ class SarControl():
         self.ser_samd21.write("Processing images...".encode('utf8'))                
         for i in range(int(len(os.listdir(self.dir))/2)):
             metadata = None
-            json_path = os.path.join(os.getcwd(), f'{i}.json')
-            img_path = os.path.join(os.getcwd(), f'{i}.png')
+            json_path = os.path.join(self.dir, f'{i}.json')
+            img_path = os.path.join(self.dir, f'{i}.png')
             with open(json_path, 'w', encoding='utf8') as file:
                 metadata = json.load(file)
             query_img = cv2.imread(img_path)
