@@ -234,7 +234,7 @@ class SarControl():
             metadata = None
             json_path = os.path.join(self.dir, f'{i}.json')
             img_path = os.path.join(self.dir, f'{i}.png')
-            with open(json_path, 'w', encoding='utf8') as file:
+            with open(json_path, 'r', encoding='utf8') as file:
                 metadata = json.load(file)
             query_img = cv2.imread(img_path)
             query_img = unidistort_cv2(query_img)
