@@ -20,7 +20,7 @@ void setup()
 
   SerialUSB.begin(9600);
   while(!SerialUSB);
-  SerialUSB.println("RFM Server!");
+  SerialUSB.println("GS Server!");
 
   //Initialize the Radio.
   if (rf95.init() == false){
@@ -29,8 +29,7 @@ void setup()
   }
   else{
   // An LED indicator to let us know radio initialization has completed.
-    SerialUSB.println("Receiver up!");
-    SerialUSB.println("00FFFF");
+    SerialUSB.println("GS receiver up!");
     digitalWrite(LED, HIGH);
     delay(500);
     digitalWrite(LED, LOW);
@@ -38,7 +37,7 @@ void setup()
   }
 
   rf95.setFrequency(frequency);
-  rf95.setTxPower(14, true);
+  //rf95.setTxPower(14, true);
 }
 
 void loop()
@@ -51,7 +50,8 @@ void loop()
     if (rf95.recv(buf, &len)){
       digitalWrite(LED, HIGH); //Turn on status LED
       timeSinceLastPacket = millis(); //Timestamp this packet
-      const char* msgIn = reinterpret_cast<char*>(const_cast<byte*>(buf));
+      const char* msgIn;
+      msgIn = reinterpret_cast<char*>(const_cast<byte*>(buf));
       SerialUSB.print((char*)msgIn);
       SerialUSB.println();
     }

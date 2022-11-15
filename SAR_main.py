@@ -109,7 +109,10 @@ class SarControl():
             return out
         def transmit_heart(data: str) -> None:
             print(f"Transmitiendo: {data}")
-            self.ser_samd21.write(data.encode('utf8'))
+            out_data = data.encode('utf8')
+            len_data = len(out_data)
+            self.ser_samd21.write(len_data.to_bytes(4, byteorder='little'))
+            self.ser_samd21.write(out_data)
         while self.heart_up:
             update_vehicle_status()
             out = parse_heart(self.heart_data)
@@ -129,7 +132,7 @@ class SarControl():
         counter = 0
         while self.camera_up:
             # cutoff a 20 m para evitar confundir el landing pad con el objeto
-            if self.vehicle.location.global_relative_frame.alt > 20.0 or self.debug:
+            if self.vehicle.location.global_relative_frame.alt:
                 filename = f"{counter}.png"
                 # TODO: plug undistort on {counter}.png
                 self.cam.capture(os.path.join(self.dir, filename))
@@ -181,15 +184,17 @@ class SarControl():
         print("Starting camera thread...")
         self.ser_samd21.write("Starting camera thread..".encode('utf8'))
         self.camera_thread.start()
-        while self.vehicle.armed:
-            self.ser_samd21.write("Vehicle is armed!".encode('utf8'))
+        print("Taking off...")
+        while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 15.0:
             sleep(1)
-            if self.vehicle.mode.name == "LAND":
-                self.ser_samd21.write("Vehicle is landing!".encode('utf8'))                
-                print("Vehicle is landing!")
-                self.camera_up = False
-                self.camera_thread.join()
+        self.ser_samd21.write("Running SaR pattern!".encode('utf8'))
+        print("Running SaR pattern!")
+        while self.vehicle.armed:
+            sleep(1)
+            if  self.vehicle.location.global_relative_frame.alt > 15.0:
+                print("Landing mode!")
                 break
+        self.ser_samd21.write("Landing!".encode('utf8'))
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
         print("Processing images...")

@@ -32,14 +32,17 @@ void setup()
     delay(500);
   }
   rf95.setFrequency(frequency);
-  rf95.setTxPower(14, true);
+  //rf95.setTxPower(14, true);
+  const char* msg = "Drone LoRa up!";
+  SerialUSB.println(msg);
 }
 
 
 void loop()
 {
   //Send a message to the other radio
-  const char* buf = SerialUSB.readStringUntil('\n').c_str();
+  const char*  buf = "";
+  buf = SerialUSB.readString().c_str();
   const byte* msgOut = reinterpret_cast<byte*>(const_cast<char*>(buf));
   rf95.send(msgOut, strlen(buf));
   rf95.waitPacketSent();
