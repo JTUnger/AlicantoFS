@@ -181,7 +181,7 @@ class SarControl():
         self.ser_samd21.write("Connected to Vehicle!".encode('utf8'))
         print("Starting heart thread")
         self.ser_samd21.write("Starting heart thread!".encode('utf8'))
-        self.heart_thread.start()
+        # self.heart_thread.start()
         while not self.vehicle.armed:
             if self.debug:
                 break
