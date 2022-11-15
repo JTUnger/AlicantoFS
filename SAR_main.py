@@ -223,6 +223,7 @@ class SarControl():
             time.sleep(0.5)
             if  self.vehicle.location.global_relative_frame.alt < 15.0:
                 print("Landing mode!")
+                self.cam.close()
         self.ser_samd21.write("Landing!".encode('utf8'))
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
