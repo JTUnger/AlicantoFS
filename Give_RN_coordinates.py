@@ -47,6 +47,8 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
 
     offset_pixels = np.substract(target_pixels, img_center_pixels)
 
+    offset_pixels = np.asarray([offset_pixels[0] *-1, offset_pixels[1]])
+
     # We will calculate relationship between a pixel and meters
     #This transforms pixels to meters (this is the scale factor)
 
@@ -61,7 +63,7 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
 
     # Now we can calculate the offset in coordinates
 
-    center_in_meters = ll_converter.LLtoUTM(2, center_image_coordinates[0], center_image_coordinates[1]) #RETURNS (ZONE, LONG, LAT)
+    center_in_meters = ll_converter.LLtoUTM(2, center_image_coordinates[1], center_image_coordinates[0]) #RETURNS (ZONE, LONG, LAT)
 
     latlon_meters = np.asarray([center_in_meters[2], center_in_meters[1]]) #Convenient (Lat,Lon) array
 
