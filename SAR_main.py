@@ -55,6 +55,9 @@ class SarControl():
         self.sift = SIFT()
         self.heart_thread = Thread(target=self.heartbeat)
         self.camera_thread = Thread(target=self.camera)
+        foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        self.dir = os.path.join(os.getcwd(), "images", foldername)
+        os.mkdir(self.dir)
     
     def query_sift(self, query_img, letter):
         # esta funcion toma una imagen y una letra, y revisa cual de ambas es
@@ -163,9 +166,6 @@ class SarControl():
         # respalda esta informacion en un archivo JSON y luego acaba
         # el programa.
         print("Running SAR mission")
-        foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
-        self.dir = os.path.join(os.getcwd(), "images", foldername)
-        os.mkdir(self.dir)
         self.ser_samd21 = Serial(self.PORT, self.BAUD)
         print(f"Connected to LoRa on {self.PORT}:{self.BAUD}")
         self.ser_samd21.write("Connected to LoRa!".encode('utf8'))
