@@ -45,7 +45,7 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
 
     # Now with the orth aligned, we need to get the distance in pixels from the center
 
-    offset_pixels = np.substract(target_pixels, img_center_pixels)
+    offset_pixels = target_pixels - img_center_pixels
 
     offset_pixels = np.asarray([offset_pixels[0] *-1, offset_pixels[1]])
 
