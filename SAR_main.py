@@ -124,36 +124,44 @@ class SarControl():
         print("Stopping heartbeat thread")
     
     def camera(self) -> None:
-        # este thread toma fotos minetras el dron este a mas de 20 m
-        # y guarda un json con informacion relativa a la foto cada 2 Hz
-        # las fotos se llaman n.jpg y n.json, donde n es el numero de foto
-        self.cam = PiCamera()
-        self.cam.resolution = (self.horizontal_res, self.vertical_res)
-        self.cam.color_effects = (128, 128)
-        self.cam.start_preview()
-        sleep(2)
-        counter = 0
-        while self.camera_up:
-            # cutoff a 20 m para evitar confundir el landing pad con el objeto
-            if self.vehicle.location.global_relative_frame.alt:
-                filename = f"{counter}.png"
-                # TODO: plug undistort on {counter}.png
-                self.cam.capture(os.path.join(self.dir, filename))
-                img_dat = {
-                    "speed": self.vehicle.groundspeed,
-                    "lat": self.vehicle.location.global_relative_frame.lat,
-                    "lon": self.vehicle.location.global_relative_frame.lon,
-                    "heading": self.vehicle.heading,
-                    "pitch": self.vehicle.attitude.pitch,
-                    "roll": self.vehicle.attitude.roll,
-                    "yaw": self.vehicle.attitude.yaw,
-                    "height": self.vehicle.location.global_relative_frame.alt,
-                }
-                with open(f'{counter}.json', 'w', encoding='utf8') as file:
-                    json.dump(img_dat, file)
-                counter += 1
-                time.sleep(0.5)
-        print("Stopping camera thread!")
+        try:
+            # este thread toma fotos minetras el dron este a mas de 20 m
+            # y guarda un json con informacion relativa a la foto cada 2 Hz
+            # las fotos se llaman n.jpg y n.json, donde n es el numero de foto
+            self.cam = PiCamera()
+            self.cam.resolution = (self.horizontal_res, self.vertical_res)
+            self.cam.color_effects = (128, 128)
+            self.cam.start_preview()
+            sleep(2)
+            counter = 0
+            while self.camera_up:
+                # cutoff a 20 m para evitar confundir el landing pad con el objeto
+                if self.vehicle.location.global_relative_frame.alt:
+                    filename = f"{counter}.png"
+                    # TODO: plug undistort on {counter}.png
+                    self.cam.capture(os.path.join(self.dir, filename))
+                    img_dat = {
+                        "speed": self.vehicle.groundspeed,
+                        "lat": self.vehicle.location.global_relative_frame.lat,
+                        "lon": self.vehicle.location.global_relative_frame.lon,
+                        "heading": self.vehicle.heading,
+                        "pitch": self.vehicle.attitude.pitch,
+                        "roll": self.vehicle.attitude.roll,
+                        "yaw": self.vehicle.attitude.yaw,
+                        "height": self.vehicle.location.global_relative_frame.alt,
+                    }
+                    with open(f'{counter}.json', 'w', encoding='utf8') as file:
+                        json.dump(img_dat, file)
+                    counter += 1
+                    time.sleep(0.5)
+            print("Stopping camera thread!")
+            self.cam.close()
+        except Exception as Argument:
+            logging.exception(Argument)
+            f = open("log.txt", "a")
+            f.write(str(Argument))
+            f.close()
+
 
 
     def run_sar(self) -> None:
@@ -273,6 +281,8 @@ if __name__ == "__main__":
         sar = SarControl()
         sar.run_sar()
     except Exception as Argument:
+        sar.camera_up = False
+        sar.heart_up = False
         logging.exception(Argument)
         f = open("log.txt", "a")
         f.write(str(Argument))
