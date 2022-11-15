@@ -54,7 +54,6 @@ class SarControl():
         self.vehicle = None
         self.sift = SIFT()
         self.heart_thread = Thread(target=self.heartbeat)
-        self.camera_thread = Thread(target=self.camera)
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
         os.mkdir(self.dir)
@@ -191,15 +190,34 @@ class SarControl():
             sleep(1)
         print("Starting camera thread...")
         self.ser_samd21.write("Starting camera thread..".encode('utf8'))
-        self.camera_thread.start()
         print("Taking off...")
         while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 17.0:
             sleep(1)
         self.ser_samd21.write("Running SaR pattern!".encode('utf8'))
+        self.cam = PiCamera()
+        self.cam.resolution = (self.horizontal_res, self.vertical_res)
+        self.cam.color_effects = (128, 128)
+        self.cam.start_preview()
         sleep(2)
-        print("Running SaR pattern!")
+        print("Running SaR pattern and camera!")
+        counter = 0
         while self.vehicle.armed:
-            sleep(1)
+            filename = f"{counter}.png"
+            self.cam.capture(os.path.join(self.dir, filename))
+            img_dat = {
+                "speed": self.vehicle.groundspeed,
+                "lat": self.vehicle.location.global_relative_frame.lat,
+                "lon": self.vehicle.location.global_relative_frame.lon,
+                "heading": self.vehicle.heading,
+                "pitch": self.vehicle.attitude.pitch,
+                "roll": self.vehicle.attitude.roll,
+                "yaw": self.vehicle.attitude.yaw,
+                "height": self.vehicle.location.global_relative_frame.alt,
+            }
+            with open(f'{counter}.json', 'w', encoding='utf8') as file:
+                json.dump(img_dat, file)
+            counter += 1
+            time.sleep(0.5)
             if  self.vehicle.location.global_relative_frame.alt > 15.0:
                 print("Landing mode!")
                 self.camera_up = False
@@ -281,7 +299,6 @@ if __name__ == "__main__":
         sar = SarControl()
         sar.run_sar()
     except Exception as Argument:
-        sar.camera_up = False
         sar.heart_up = False
         logging.exception(Argument)
         f = open("log.txt", "a")
