@@ -193,6 +193,8 @@ class SarControl():
         print("Taking off...")
         while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 17.0:
             sleep(1)
+            if self.debug:
+                break
         self.ser_samd21.write("Running SaR pattern!".encode('utf8'))
         self.cam = PiCamera()
         self.cam.resolution = (self.horizontal_res, self.vertical_res)
@@ -220,9 +222,8 @@ class SarControl():
             time.sleep(0.5)
             if  self.vehicle.location.global_relative_frame.alt > 15.0:
                 print("Landing mode!")
-                self.camera_up = False
-                self.camera_thread.join()
-                break
+                if not self.debug:
+                    break
         self.ser_samd21.write("Landing!".encode('utf8'))
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
         positions = {'r': [], 'n': []}
