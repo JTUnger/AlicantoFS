@@ -185,14 +185,17 @@ class SarControl():
         self.ser_samd21.write("Starting camera thread..".encode('utf8'))
         self.camera_thread.start()
         print("Taking off...")
-        while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 15.0:
+        while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 17.0:
             sleep(1)
         self.ser_samd21.write("Running SaR pattern!".encode('utf8'))
+        sleep(2)
         print("Running SaR pattern!")
         while self.vehicle.armed:
             sleep(1)
             if  self.vehicle.location.global_relative_frame.alt > 15.0:
                 print("Landing mode!")
+                self.camera_up = False
+                self.camera_thread.join()
                 break
         self.ser_samd21.write("Landing!".encode('utf8'))
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
