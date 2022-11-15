@@ -9,8 +9,8 @@ class SIFT(object):
         # Initiate SIFT detector
         self.sift = cv2.SIFT_create()
         self.draw_params = {"matchColor":(0,255,0), "singlePointColor": None, "flags": 2}
-        self.robo_r = cv2.imread("letters/roboR/r0.png")
-        self.robo_n = cv2.imread("letters/roboN/n0.png") 
+        self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
+        self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
     
     
     def set_query_img(self, img_query):
