@@ -279,13 +279,13 @@ class SarControl():
             self.heart_data['objectA'] = 'r'
             self.heart_data['latA'] = averages['r'][0]
             self.heart_data['nsA'] = 'S'
-            self.heart_data['lonA'] = averages['r'][0]
+            self.heart_data['lonA'] = averages['r'][1]
             self.heart_data['ewA'] = 'E'
         if averages['n']:
             self.heart_data['objectB'] = 'n'
             self.heart_data['latB'] = averages['n'][0]
             self.heart_data['nsB'] = 'S'
-            self.heart_data['lonB'] = averages['n'][0]
+            self.heart_data['lonB'] = averages['n'][1]
             self.heart_data['ewB'] = 'E'
         
         with open(os.path.join(self.dir, 'end_data.json'), 'w', encoding='utf8') as file:
