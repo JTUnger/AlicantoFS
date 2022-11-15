@@ -82,7 +82,7 @@ class SarControl():
                 return None
         else:
             raise ValueError("Letter must be 'n' or 'r'")
-        if key_pts is not None:
+        if len(key_pts) > 0: #Atento aca, esta entrando cuando no deberia
             x = 0
             y = 0
             for pt in key_pts:
