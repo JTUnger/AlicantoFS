@@ -72,6 +72,6 @@ def coordenadas_RN(width, height, vehicle_altitude, center_image_coordinates, ta
     offset_in_coordinates = ll_converter.UTMtoLL(2, coordinates_meters_with_offset[0], coordinates_meters_with_offset[1], center_in_meters[0])
     # RETURNS (LAT,LONG)
 
-    return offset_in_coordinates[0], offset_in_coordinates[1]
+    return offset_in_coordinates[1], offset_in_coordinates[0]
     
 
