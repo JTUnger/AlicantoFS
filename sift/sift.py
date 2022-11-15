@@ -9,9 +9,10 @@ class SIFT(object):
         # Initiate SIFT detector
         self.sift = cv2.SIFT_create()
         self.draw_params = {"matchColor":(0,255,0), "singlePointColor": None, "flags": 2}
-        self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
-        self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
-    
+        #self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
+        #self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
+        self.robo_r = cv2.imread("./letters/roboR/r0.png")
+        self.robo_n = cv2.imread("./letters/roboN/n0.png")
     
     def set_query_img(self, img_query):
         self.img_query =  img_query
@@ -66,8 +67,8 @@ if __name__ == '__main__':
 
     sift = SIFT()
     
-    img_query = cv2.imread("letters/roboN/n0.png")  # imagen del dataset recortada
-    img_train = cv2.imread("letters/roboN/n2.png")  # imagen a consultar
+    img_query = cv2.imread("letters/roboR/r0.png")  # imagen del dataset recortada
+    img_train = cv2.imread("letters/roboR/r3.png")  # imagen a consultar
     #img_train = cv2.imread("letters/roboR/r1.png")
 
     sift.set_query_img(img_query)

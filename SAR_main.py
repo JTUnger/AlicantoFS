@@ -221,7 +221,7 @@ class SarControl():
                 json.dump(img_dat, file)
             counter += 1
             time.sleep(0.5)
-            if  self.vehicle.location.global_relative_frame.alt > 15.0:
+            if  self.vehicle.location.global_relative_frame.alt < 15.0:
                 print("Landing mode!")
                 if not self.debug:
                     break
