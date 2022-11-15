@@ -203,6 +203,7 @@ class SarControl():
         sleep(2)
         print("Running SaR pattern and camera!")
         counter = 0
+        print(f"Arm status: {self.vehicle.armed}!")
         while self.vehicle.armed:
             filename = f"{counter}.png"
             self.cam.capture(os.path.join(self.dir, filename))
@@ -216,7 +217,7 @@ class SarControl():
                 "yaw": self.vehicle.attitude.yaw,
                 "height": self.vehicle.location.global_relative_frame.alt,
             }
-            with open(f'{counter}.json', 'w', encoding='utf8') as file:
+            with open(os.path.join(self.dir, f'{counter}.json'), 'w', encoding='utf8') as file:
                 json.dump(img_dat, file)
             counter += 1
             time.sleep(0.5)
