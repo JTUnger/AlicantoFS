@@ -394,7 +394,7 @@ def landingpad_precision_landing(vehicle):
     vehicle.parameters['LAND_SPEED'] = 30 ##Descent speed of 20cm/s
 
     f = open("landing_log.txt", "a")
-    f.write(f"New landing attempt!")
+    f.write(f"New landing attempt\n")
     f.close()
     while vehicle.armed == True:
         #Capture frame and flip to correct orientation and prep
@@ -413,7 +413,7 @@ def landingpad_precision_landing(vehicle):
             #Send precision landing information to the autopilot
             send_land_message(vehicle, x_angle, y_angle)
             f = open("landing_log.txt", "a")
-            f.write(f"{x_center}:{y_center}")
+            f.write(f"{x_center}:{y_center}\n")
             f.close()
             print(f"X CENTER OF CIRCLE: {x_center} Y CENTER OF CIRCLE: {y_center}")
 
