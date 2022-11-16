@@ -188,8 +188,8 @@ class SarControl():
             print("Waiting for vehicle to arm...")
             self.ser_samd21.write("Waiting for vehicle to arm...".encode('utf8'))
             sleep(1)
-        print("Starting camera thread...")
-        self.ser_samd21.write("Starting camera thread..".encode('utf8'))
+        ##print("Starting camera thread...")
+        ##self.ser_samd21.write("Starting camera thread..".encode('utf8'))
         print("Taking off...")
         while self.vehicle.armed and self.vehicle.location.global_relative_frame.alt < 17.0:
             sleep(1)
