@@ -9,14 +9,24 @@ class SIFT(object):
         # Initiate SIFT detector
         self.sift = cv2.SIFT_create()
         self.draw_params = {"matchColor":(0,255,0), "singlePointColor": None, "flags": 2}
-        #self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
-        #self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
-        self.robo_r = cv2.imread("./letters/roboR/r0.png")
-        self.robo_n = cv2.imread("./letters/roboN/n0.png")
+        self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
+        self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
+        self.robo_b = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/black/b0.png")
+        #self.robo_r = cv2.imread("./letters/roboR/r0.png")
+        #self.robo_n = cv2.imread("./letters/roboN/n0.png")
     
     def set_query_img(self, img_query):
         self.img_query =  img_query
         self.kp_q, self.des_q = self.sift.detectAndCompute(self.img_query, None)
+    
+    def filter_grass(self, query_img):
+        # retorna True si cree que hay solo pasto
+        canny_query = cv2.Canny(query_img,100,200)
+        ones = np.count_nonzero(canny_query)
+        if ones > 10:
+            return False
+        else:
+            return True
         
     
     def get_sift_matches(self, img_train, FLANN_INDEX_KDTREE = 1):
@@ -45,7 +55,6 @@ class SIFT(object):
     
 
     def get_keypoints(self, kp_t, good, max_pts=10):
-        
         if max_pts > int(len(good)):
             max_pts = len(good)
         
@@ -53,7 +62,6 @@ class SIFT(object):
 
 
     def draw_keypoints(self, img, key_pts):
-
         for pt in key_pts:
             pt_pix = (int(pt[0]), int(pt[1]))
             cv2.circle(img, pt_pix, 5, (0,0,255), -1, 5)

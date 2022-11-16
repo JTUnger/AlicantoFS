@@ -52,7 +52,9 @@ class SarControl():
         self.status_values = {"Manual": 1, "Autonomous": 2, "Faulted": 3}
         self.status_format = ["objectA", "latA", "nsA", "lonA", "ewA", "objectB", "latB", "nsB", "lonB", "ewB", "id", "status", ]
         self.vehicle = None
-        self.sift = SIFT()
+        self.sift_r = SIFT()
+        self.sift_n = SIFT()
+        self.sift_b = SIFT()
         self.heart_thread = Thread(target=self.heartbeat)
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
@@ -63,25 +65,31 @@ class SarControl():
         # retorna None en caso de no encontrar una respuesta o un match doble
         # en caso de encontrar una letra, retorna el centroide de los 
         # landmarks identificados
+        if self.sift_b.filter_grass(query_img):
+            return None
         kp_t = None
         good = None
         key_pts = None
         if letter == 'r':
-            self.sift.set_query_img(self.sift.robo_r)
-            kp_t, good = self.sift.get_sift_matches(query_img)
+            kp_t, good = self.sift_r.get_sift_matches(query_img)
             if kp_t is not None and good is not None:
-                key_pts = self.sift.get_keypoints(kp_t, good)
+                key_pts = self.sift_r.get_keypoints(kp_t, good)
             else:
                 return None
         elif letter == 'n':
-            self.sift.set_query_img(self.sift.robo_n)
-            kp_t, good = self.sift.get_sift_matches(query_img)
+            kp_t, good = self.sift_n.get_sift_matches(query_img)
             if kp_t is not None and good is not None:
-                key_pts = self.sift.get_keypoints(kp_t, good)
+                key_pts = self.sift_n.get_keypoints(kp_t, good)
+            else:
+                return None
+        elif letter == 'b':
+            kp_t, good = self.sift_b.get_sift_matches(query_img)
+            if kp_t is not None and good is not None:
+                key_pts = self.sift_b.get_keypoints(kp_t, good)
             else:
                 return None
         else:
-            raise ValueError("Letter must be 'n' or 'r'")
+            raise ValueError("Letter must be 'n', 'r' or 'b'")
         if len(key_pts) > 0: #Atento aca, esta entrando cuando no deberia
             x = 0
             y = 0
@@ -246,6 +254,7 @@ class SarControl():
             query_img = unidistort_cv2(query_img)
             query_r = self.query_sift(query_img, 'r')
             query_n = self.query_sift(query_img, 'n')
+            query_b = self.query_sift(query_img, 'b')
             print("Sift Query done")
             query_centroid = None
             if (query_r and query_n) or (metadata["height"] < 20.0 and not self.debug):
