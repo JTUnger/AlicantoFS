@@ -22,7 +22,9 @@ def contour_target(image):
             contours.append(c)
 
 def hough_target(image):
-    im = cv2.medianBlur(image,5)
+    im_smooth = cv2.medianBlur(image,5)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+    im = clahe.apply(im_smooth[:,:,0])
     canny = cv2.Canny(im,100,200)
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
     dilate = cv2.dilate(canny, kernel, iterations=1)
