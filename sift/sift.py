@@ -21,7 +21,9 @@ class SIFT(object):
     
     def filter_grass(self, query_img):
         # retorna True si cree que hay solo pasto
-        canny_query = cv2.Canny(query_img,100,200)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+        query_img_clahe = clahe.apply(query_img[:,:,0])
+        canny_query = cv2.Canny(query_img_clahe,100,200)
         ones = np.count_nonzero(canny_query)
         if ones > 10:
             return False
