@@ -393,6 +393,9 @@ def landingpad_precision_landing(vehicle):
     vehicle.parameters['PLND_EST_TYPE'] = 0 ##0 for raw sensor, 1 for kalman filter pos estimation
     vehicle.parameters['LAND_SPEED'] = 30 ##Descent speed of 20cm/s
 
+    f = open("landing_log.txt", "a")
+    f.write(f"New landing attempt!")
+    f.close()
     while vehicle.armed == True:
         #Capture frame and flip to correct orientation and prep
         frame = capture.read()
@@ -409,6 +412,9 @@ def landingpad_precision_landing(vehicle):
             y_angle = (y_center - vertical_res/2) * (vertical_fov / vertical_res)
             #Send precision landing information to the autopilot
             send_land_message(vehicle, x_angle, y_angle)
+            f = open("landing_log.txt", "a")
+            f.write(f"{x_center}:{y_center}")
+            f.close()
             print(f"X CENTER OF CIRCLE: {x_center} Y CENTER OF CIRCLE: {y_center}")
 
 def loiter_aruco(vehicle, loiter_height, loiter_time, safety_height = 15, id_aruco = 72, size_aruco_cm = 20):

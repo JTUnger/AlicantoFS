@@ -225,7 +225,13 @@ class SarControl():
                 print("Landing mode!")
                 self.cam.close()
         self.ser_samd21.write("Landing!".encode('utf8'))
+        f = open("log.txt", "a")
+        f.write("Attempting to land!")
+        f.close()
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
+        f = open("log.txt", "a")
+        f.write("Finished landing attempt!")
+        f.close()
         positions = {'r': [], 'n': []}
         print("Processing images...")
         self.ser_samd21.write("Processing images...".encode('utf8'))                
