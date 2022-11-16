@@ -11,6 +11,8 @@ from time import sleep
 from sift.sift import SIFT
 from datetime import datetime
 import logging
+import multiprocessing as mp
+import re
 
 class SarControl():
     def __init__(self, port: str="/dev/ttyACM0", baud: int=9600, debug=False) -> None:
@@ -169,7 +171,61 @@ class SarControl():
             f.write(str(Argument))
             f.close()
 
-
+    def image_procesing(self, start: int, stop: int, path: str) -> None:
+        try:
+            positions = {'r': [], 'n': [], 'b': []}
+            for i in range(start, stop):
+                metadata = None
+                json_path = os.path.join(path, f"{i}.json")
+                with open(json_path, 'r', encoding='utf8') as file:
+                    metadata = json.load(file)
+                query_img = cv2.imread(os.path.join(path, f"{i}.png"))
+                query_img = unidistort_cv2(query_img)
+                query_r = self.query_sift(query_img, 'r')
+                query_n = self.query_sift(query_img, 'n')
+                query_b = self.query_sift(query_img, 'b')
+                if (
+                    (query_r and query_n) or (metadata["height"] < 20.0 and not self.debug)
+                    or (query_r and query_b) or (query_n and query_b) or (query_r and query_n and query_b)
+                ):
+                    continue
+                elif query_r:
+                    query_centroid = query_r
+                    lat, lon = coordenadas_RN(
+                        width=self.horizontal_res, height=self.vertical_res,
+                        vehicle_altitude=metadata['height'],
+                        center_image_coordinates=(metadata['lat'], metadata['lon']),
+                        target_xy_coordinates=query_centroid,
+                        vehicle_heading=metadata['heading']
+                    )
+                    positions['r'].append((lat, lon))
+                elif query_n:
+                    query_centroid = query_n
+                    lat, lon = coordenadas_RN(
+                        width=self.horizontal_res, height=self.vertical_res,
+                        vehicle_altitude=metadata['height'],
+                        center_image_coordinates=(metadata['lat'], metadata['lon']),
+                        target_xy_coordinates=query_centroid,
+                        vehicle_heading=metadata['heading']
+                    )
+                    positions['n'].append((lat, lon))
+                elif query_b:
+                    query_centroid = query_b
+                    lat, lon = coordenadas_RN(
+                        width=self.horizontal_res, height=self.vertical_res,
+                        vehicle_altitude=metadata['height'],
+                        center_image_coordinates=(metadata['lat'], metadata['lon']),
+                        target_xy_coordinates=query_centroid,
+                        vehicle_heading=metadata['heading']
+                    )
+                    positions['b'].append((lat, lon))
+            with open(os.path.join(path, f"positions_{start}_{stop}.json"), 'w', encoding='utf8') as file:
+                json.dump(positions, file)
+        except Exception as Argument:
+            logging.exception(Argument)
+            f = open("log.txt", "a")
+            f.write(str(Argument))
+            f.close()
 
     def run_sar(self) -> None:
         # esta funcion crea una carpeta con la fecha y hora actual
@@ -234,51 +290,30 @@ class SarControl():
                 self.cam.close()
                 break
         self.ser_samd21.write("Landing!".encode('utf8'))
-        f = open("log.txt", "a")
-        f.write("Attempting to land!")
-        f.close()
+        print("Attemoting to land!")
         landingpad_precision_landing(self.vehicle) #Este puede fallar hay que debugear!
-        f = open("log.txt", "a")
-        f.write("Finished landing attempt!")
-        f.close()
         positions = {'r': [], 'n': []}
         print("Processing images...")
         self.ser_samd21.write("Processing images...".encode('utf8'))                
-        for i in range(int(len(os.listdir(self.dir))/2)):
-            metadata = None
-            json_path = os.path.join(self.dir, f'{i}.json')
-            img_path = os.path.join(self.dir, f'{i}.png')
-            with open(json_path, 'r', encoding='utf8') as file:
-                metadata = json.load(file)
-            query_img = cv2.imread(img_path)
-            query_img = unidistort_cv2(query_img)
-            query_r = self.query_sift(query_img, 'r')
-            query_n = self.query_sift(query_img, 'n')
-            query_b = self.query_sift(query_img, 'b')
-            print("Sift Query done")
-            query_centroid = None
-            if (query_r and query_n) or (metadata["height"] < 20.0 and not self.debug):
-                pass  # descartar, R y N o esta a menos de 20 m
-            elif query_r:
-                query_centroid = query_r
-                lat, lon = coordenadas_RN(
-                    width=self.horizontal_res, height=self.vertical_res,
-                    vehicle_altitude=metadata['height'],
-                    center_image_coordinates=(metadata['lat'], metadata['lon']),
-                    target_xy_coordinates=query_centroid,
-                    vehicle_heading=metadata['heading']
-                )
-                positions['r'].append((lat, lon))
-            elif query_n:
-                query_centroid = query_n
-                lat, lon = coordenadas_RN(
-                    width=self.horizontal_res, height=self.vertical_res,
-                    vehicle_altitude=metadata['height'],
-                    center_image_coordinates=(metadata['lat'], metadata['lon']),
-                    target_xy_coordinates=query_centroid,
-                    vehicle_heading=metadata['heading']
-                )
-                positions['n'].append((lat, lon))
+        n_pictures = int(len(os.listdir(self.dir))/2)
+        # divide n_pictures in 4 ranges
+        ranges = [int(n_pictures/4), int(n_pictures/2), int(3*n_pictures/4), n_pictures]
+        # create 4 processes to run image_processing in each range
+        processes = []
+        for i in range(4):
+            p = mp.Process(target=self.image_processing, args=(self.dir, ranges[i-1], ranges[i]))
+            processes.append(p)
+            p.start()
+        # wait for all processes to finish
+        for p in processes:
+            p.join()
+        # read all json files and get the positions
+        for file in os.listdir(self.dir):
+            if re.match(r'positions_\d+_\d+.json', file):
+                with open(os.path.join(self.dir, file), 'r', encoding='utf8') as f:
+                    data = json.load(f)
+                    positions['r'].extend(data['r'])
+                    positions['n'].extend(data['n'])
         averages = {'n': (None, None), 'r': (None, None)}
         for key in positions.keys():
             # TODO: remove outliars?
