@@ -12,11 +12,13 @@ class SIFT(object):
         self.robo_r = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboR/r0.png")
         self.robo_n = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/roboN/n0.png")
         self.robo_b = cv2.imread("/home/alicanto/AlicantoFS/sift/letters/black/b0.png")
-        #self.robo_r = cv2.imread("./letters/roboR/r0.png")
-        #self.robo_n = cv2.imread("./letters/roboN/n0.png")
+        #self.robo_r = cv2.imread("./sift/letters/roboR/r0.png")
+        #self.robo_n = cv2.imread("./sift/letters/roboN/n0.png")
+        #self.robo_b = cv2.imread("./sift/letters/black/b0.png")
     
     def set_query_img(self, img_query):
         self.img_query =  img_query
+        print(type(img_query))
         self.kp_q, self.des_q = self.sift.detectAndCompute(self.img_query, None)
     
     def filter_grass(self, query_img):
@@ -77,8 +79,8 @@ if __name__ == '__main__':
 
     sift = SIFT()
     
-    img_query = cv2.imread("letters/roboR/r0.png")  # imagen del dataset recortada
-    img_train = cv2.imread("letters/roboR/r3.png")  # imagen a consultar
+    img_query = cv2.imread("./sift/letters/black/b0.png")  # imagen del dataset recortada
+    img_train = cv2.imread("d:/3/18.png")  # imagen a consultar
     #img_train = cv2.imread("letters/roboR/r1.png")
 
     sift.set_query_img(img_query)

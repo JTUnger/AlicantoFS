@@ -1,16 +1,17 @@
 import json
-from flight_functions import *
+#from flight_functions import *
 from cv_functions import *
-from funciones_lora import *
+#from funciones_lora import *
 from Give_RN_coordinates import coordenadas_RN
 from undistort_images import unidistort_cv2
-from picamera import PiCamera
+#from picamera import PiCamera
 from threading import Thread
 from serial import Serial
 from time import sleep
 from sift.sift import SIFT
 from datetime import datetime
 import logging
+import os
 
 class SarControl():
     def __init__(self, port: str="/dev/ttyACM0", baud: int=9600, debug=False) -> None:
@@ -53,8 +54,11 @@ class SarControl():
         self.status_format = ["objectA", "latA", "nsA", "lonA", "ewA", "objectB", "latB", "nsB", "lonB", "ewB", "id", "status", ]
         self.vehicle = None
         self.sift_r = SIFT()
+        self.sift_r.set_query_img(self.sift_r.robo_r)
         self.sift_n = SIFT()
+        self.sift_n.set_query_img(self.sift_n.robo_n)
         self.sift_b = SIFT()
+        self.sift_b.set_query_img(self.sift_b.robo_b)
         self.heart_thread = Thread(target=self.heartbeat)
         foldername = f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
         self.dir = os.path.join(os.getcwd(), "images", foldername)
